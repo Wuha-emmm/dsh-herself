@@ -326,7 +326,7 @@ export function apply(ctx, baseConfig = {}) {
           counts: self.counts,
           refuted: self.refuted,
           narrative: self.narrative,
-          beliefs: self.beliefs.slice(-5),
+          beliefs: self.beliefs.slice(-60),   // 面板要看全部（以前只给 5 条，判断多了就看不全）
           readings: self.readingList ?? [],
           candidateStances: self.candidateStances ?? [],
           wake: (() => {

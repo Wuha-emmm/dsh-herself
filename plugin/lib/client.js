@@ -72,6 +72,7 @@ window.__ModuleLoader__.load({
       ['login', '登录'],
       ['memory', '记忆'],
       ['growth', '成长'],
+      ['hands', '手'],
       ['snowluma', 'SnowLuma'],
     ]
 
@@ -508,7 +509,8 @@ window.__ModuleLoader__.load({
           : tab === 'login' ? h(LoginPage)
             : tab === 'memory' ? h(MemoryPage)
               : tab === 'growth' ? h(GrowthPage)
-                : tab === 'snowluma' ? h(SnowLumaPage) : h(StatePage)
+                  : tab === 'hands' ? h(HandsPage)
+                    : tab === 'snowluma' ? h(SnowLumaPage) : h(StatePage)
       return h('div', { className: 'dher' },
         h('style', {}, CSS),
         h('div', {},

@@ -266,7 +266,8 @@ ok(/@media \(max-width:760px\)/.test(css), '窄屏会改成上下排（否则右
   const tabsBlock = (SRC.match(/const TABS = \[([\s\S]*?)\n    \]/) || [])[1] || ''
   const tabIds = [...tabsBlock.matchAll(/\['(\w+)'/g)].map((m) => m[1])
   ok(tabIds.every((id) => SRC.includes('tab === ' + String.fromCharCode(39) + id + String.fromCharCode(39))), '每个页签都有对应页面', JSON.stringify(tabIds))
-  ok(!/h\(HandsPage\)/.test(SRC), '没有点开是空白的死页签')
+  const used = [...new Set([...SRC.matchAll(/h\((\w+Page)\)/g)].map((m) => m[1]))]
+  ok(used.every((n) => SRC.indexOf('function ' + n + '(') >= 0), '用到的页面组件都定义了（不会点开空白）', JSON.stringify(used))
   ok(/她现在相信什么/.test(SRC) && /当初是因为/.test(SRC), '判断清单带时间与证据')
   ok(/brainHolder/.test(SRC), '把占着大脑的 pid 说出来，不是含糊的有人在用')
 }
