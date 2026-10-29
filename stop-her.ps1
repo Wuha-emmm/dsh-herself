@@ -1,6 +1,17 @@
 ﻿# stop-her.ps1 - 停掉她的 node 进程和 OneBot 运行时（SnowLuma 默认；NapCat 仅回滚时存在）。
 # 不碰用户自己的 QQ：只关从 DSH-herself\SnowLuma 或 NapCat 目录起来的那些进程。
+# 破坏性操作要二次确认：面板会显式传 -Yes（用户点过确认），
+# 手动敲命令时不带 -Yes 就先问一句；非交互环境直接拒绝，避免手滑/脚本误伤。
+param([switch]$Yes)
 $ErrorActionPreference = 'SilentlyContinue'
+if (-not $Yes) {
+    if (-not [Environment]::UserInteractive) {
+        Write-Host '这是破坏性操作：要停她请显式加 -Yes' -ForegroundColor Yellow
+        exit 2
+    }
+    $answer = Read-Host '要停掉她（含 QQ 运行时）吗？输入 yes 确认'
+    if ($answer -ne 'yes') { Write-Host '已取消'; exit 0 }
+}
 $root = 'E:\DSH-herself'
 $pidFile = Join-Path $root 'logs\pids.json'
 

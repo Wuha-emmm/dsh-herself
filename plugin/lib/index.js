@@ -315,6 +315,8 @@ export function apply(ctx, baseConfig = {}) {
         const self = derive(events, Date.now())
         return sendJson(res, 200, {
           ok: true,
+          readonly: !pluginBrain.ok,
+          brainHolder: pluginBrain.ok ? null : (pluginBrain.pid ?? null),
           root,
           born: events.some((e) => e.type === 'seed'),
           day: self.day,
@@ -377,7 +379,13 @@ export function apply(ctx, baseConfig = {}) {
 
       if (p === '/dsh-herself/api/stack/stop' && req.method === 'POST') {
         if (brainBusy()) return refused(res)
-        const r = await runPs('stop-her.ps1')
+        // 破坏性操作：必须有显式 confirm（面板会先弹一次确认框）
+        const bodyRaw = await readBody(req)
+        let confirmed = false
+        try { confirmed = String(JSON.parse(bodyRaw || '{}').confirm ?? '') === 'yes' } catch { /* 不是 JSON */ }
+        if (!confirmed) return sendJson(res, 400, { ok: false, error: '这是破坏性操作：要停她得显式确认（confirm: yes）' })
+        const r = await runPs('stop-her.ps1', ['-Yes'])
+        return sendJson(res, 200, { ok: r.code === 0, ...r })
         return sendJson(res, 200, { ok: r.code === 0, ...r })
       }
 

@@ -134,9 +134,18 @@ for (let i = 0; i < comps.length; i += 2) {
 // 插件的写入口也必须认脑子锁（否则第二个 DSH 工作区照样能写事件）
 {
   const srv = readSrc('plugin/lib/index.js')
-  const gated = /pluginBrain/.test(srv) && /api\/say'[\s\S]{0,200}brainBusy/.test(srv) && /stack\/start'[\s\S]{0,160}brainBusy/.test(srv)
+  const gates = (srv.match(/brainBusy\(\)/g) || []).length
+  const gated = /pluginBrain/.test(srv) && gates >= 3   // 起、停、说三个入口各一次
   if (gated) Y('插件的写入口认脑子锁（第二个工作区只读，409 说清是谁占着）')
   else W('插件能绕过脑子锁写事件：两个 DSH 工作区会各写一份')
+}
+// 破坏性操作要有二次确认
+{
+  const stop = readSrc('stop-her.ps1')
+  const srv = readSrc('plugin/lib/index.js')
+  const guarded = /param\(\[switch\]\$Yes\)/.test(stop) && /confirm/.test(srv) && /stop-her\.ps1', \['-Yes'\]/.test(srv)
+  if (guarded) Y('停她是破坏性操作：脚本要 -Yes，接口要 confirm，面板先弹确认框')
+  else W('停她可以一键触发（脚本/接口缺二次确认）')
 }
 // 端到端：不只有零件级测试，还得有一条"她真的回了话"
 {

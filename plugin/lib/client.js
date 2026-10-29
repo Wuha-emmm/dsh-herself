@@ -425,8 +425,9 @@ window.__ModuleLoader__.load({
         h('div', { className: 'card' },
           h('h3', {}, '开关'),
           h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap' } },
-            h('button', { className: 'go', onClick: () => act('/stack/start') }, '启动 / 自愈'),
-            h('button', { className: 'go', onClick: () => act('/stack/stop') }, '停止'),
+            h('button', { className: 'go', onClick: () => act('/stack/start', { confirm: 'yes' }) }, '启动 / 自愈'),
+            // 破坏性操作先问一次，再去服务端（服务端还会再验一次 confirm）
+            h('button', { className: 'go danger', onClick: () => { if (window.confirm('确认停掉她？她正在跟你说话的话会停在半句。')) act('/stack/stop', { confirm: 'yes' }) } }, '停止'),
           ),
           msg ? h('p', { className: 'sub', style: { marginTop: 8 } }, msg) : null,
           h('p', { className: 'sub' }, '启动会拉起 SnowLuma + QQ + 监听 + 主动发言；停止只关她那个 QQ 实例，不影响你自己的 QQ。'),
