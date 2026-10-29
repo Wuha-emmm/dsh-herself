@@ -280,5 +280,36 @@ ok(/@media \(max-width:760px\)/.test(css), '窄屏会改成上下排（否则右
   ok(!/模型 ' \+/.test(SRC), '内部服务不再被标成「模型」')
   ok(/brainHolder/.test(SRC), '把占着大脑的 pid 说出来，不是含糊的有人在用')
 }
+
+// ---------------------------------------------------------------- 真的渲染一遍（执行组件）
+// 老断言里 createElement 只记下 type，所以渲染期错误（`st is not defined` 那类）抓不到。
+// 这一步把树里的函数组件/类组件真的调用一遍——点开才崩的东西，在这里就崩。
+function deepRender(node) {
+  if (node == null || typeof node !== 'object') return node
+  if (Array.isArray(node)) return node.map(deepRender)
+  const t = node.type
+  if (typeof t === 'function') {
+    const props = { ...(node.props || {}), children: node.children }
+    const out = (t.prototype && typeof t.prototype.render === 'function') ? new t(props).render() : t(props)
+    return deepRender(out)
+  }
+  return { ...node, children: (node.children || []).map(deepRender) }
+}
+{
+  // 设置页的壳：默认渲染第一个页签（状态）——当年 `st is not defined` 就死在那里
+  for (const name of ['HerSection', 'LivePage']) {
+    const fn = captured?.[name]
+    if (typeof fn !== 'function') { ok(false, `${name} 没被导出`); continue }
+    let err = ''
+    let tree = null
+    try { tree = deepRender(fn()) } catch (e) { err = String(e?.message ?? e) }
+    ok(!err, `${name} 渲染不抛错（真的执行组件）`, err)
+    ok(tree !== undefined, `${name} 有返回值`, String(tree))
+  }
+  // 页签文案到页面组件的映射还在（防止"点开空白"）
+  const tabs = [...SRC.matchAll(/\['(\w+)', '([^']+)'\]/g)].map((m) => m[1])
+  ok(tabs.length >= 5, '页签表还在', String(tabs.length))
+}
+
 console.log(`\n${pass} 通过 / ${fail} 失败`)
 process.exit(fail ? 1 : 0)
