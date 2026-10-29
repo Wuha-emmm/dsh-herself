@@ -72,7 +72,6 @@ window.__ModuleLoader__.load({
       ['login', '登录'],
       ['memory', '记忆'],
       ['growth', '成长'],
-      ['hands', '手'],
       ['snowluma', 'SnowLuma'],
     ]
 
@@ -279,12 +278,21 @@ window.__ModuleLoader__.load({
           }),
         ),
         h('div', { className: 'card' },
-          h('h3', {}, '现在的判断（最多 5 条）'),
+          h('h3', {}, `她现在相信什么（${(s.beliefs || []).length} 条）`),
           (s.beliefs || []).filter((b) => !q || String(b.text).includes(q)).length
-            ? s.beliefs.filter((b) => !q || String(b.text).includes(q)).map((b, i) => h('div', { className: 'row', key: i },
-              h('span', { className: 'chip ' + (b.status === 'active' ? 'on' : 'off') }, b.status),
-              h('span', { style: { flex: 1 } }, b.text)))
+            ? (s.beliefs || []).filter((b) => !q || String(b.text).includes(q)).map((b) => h('div', { key: b.id, style: { padding: '7px 0', borderTop: '.5px solid var(--dsw-alias-border-l2)' } },
+              h('div', { className: 'row' },
+                h('span', { className: 'chip ' + (b.status === 'active' ? 'on' : 'off') }, b.status === 'active' ? '算数' : '已顶掉'),
+                h('span', { style: { flex: 1 } }, b.text),
+                h('span', { className: 'muted' }, String(b.since ?? b.at ?? '').slice(5, 16).replace('T', ' ')),
+              ),
+              b.evidence && b.evidence[0]
+                ? h('div', { className: 'sub', style: { marginTop: 3 } }, '当初是因为：' + String(b.evidence[0].text ?? '').slice(0, 60))
+                : null,
+              b.until ? h('div', { className: 'sub' }, '顶掉于 ' + String(b.until).slice(5, 16).replace('T', ' ')) : null,
+            ))
             : h('p', { className: 'muted' }, q ? '没有匹配的判断。' : '还没有判断。先让她说一句话。'),
+          h('p', { className: 'sub', style: { marginTop: 8 } }, '这里只能看：判断是她自己下的，你改不了。过时了就直接告诉她。'),
         ),
         h('div', { className: 'card' },
           h('h3', {}, '系统对她的解读（推断，不是她申报的）'),
@@ -500,8 +508,7 @@ window.__ModuleLoader__.load({
           : tab === 'login' ? h(LoginPage)
             : tab === 'memory' ? h(MemoryPage)
               : tab === 'growth' ? h(GrowthPage)
-                : tab === 'snowluma' ? h(SnowLumaPage)
-                  : h(HandsPage)
+                : tab === 'snowluma' ? h(SnowLumaPage) : h(StatePage)
       return h('div', { className: 'dher' },
         h('style', {}, CSS),
         h('div', {},

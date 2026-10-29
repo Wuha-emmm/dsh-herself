@@ -262,6 +262,12 @@ ok(/@media \(max-width:760px\)/.test(css), '窄屏会改成上下排（否则右
   // 面板是运行时渲染的，这里从句柄层钉住：只读分支必须在，并且要说清是谁占着
   ok(/st\?\.readonly/.test(SRC), '面板读 state.readonly')
   ok(SRC.includes('这个面板只能看'), '只读时显示「这个面板只能看」')
+  // 页签不能有死链：每个 tab 都要有页面，页面组件不能是未定义的
+  const tabsBlock = (SRC.match(/const TABS = \[([\s\S]*?)\n    \]/) || [])[1] || ''
+  const tabIds = [...tabsBlock.matchAll(/\['(\w+)'/g)].map((m) => m[1])
+  ok(tabIds.every((id) => SRC.includes('tab === ' + String.fromCharCode(39) + id + String.fromCharCode(39))), '每个页签都有对应页面', JSON.stringify(tabIds))
+  ok(!/h\(HandsPage\)/.test(SRC), '没有点开是空白的死页签')
+  ok(/她现在相信什么/.test(SRC) && /当初是因为/.test(SRC), '判断清单带时间与证据')
   ok(/brainHolder/.test(SRC), '把占着大脑的 pid 说出来，不是含糊的有人在用')
 }
 console.log(`\n${pass} 通过 / ${fail} 失败`)
