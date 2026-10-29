@@ -159,3 +159,14 @@
 | 怎么退 | 删掉该文件与 README 里的链接 |
 | 影响 | 接手的人能先读这一份再动代码；边界和欠账写在最后一节，不粉饰 |
 | 提交 | 081ed21 |
+
+## 2026-10-29 19:58 她可以改自己的头像/签名/昵称了 + docs/SKILLS.md
+
+| 项 | 内容 |
+|---|---|
+| 动了什么 | lib/profile.mjs（setSignature/setAvatar/setNickname/current）+ 四只工具（my_profile/set_signature/set_avatar/set_nickname，共 26 只）；成功时写 action 事件；新增 docs/SKILLS.md（26 只手分组 + 她能自己决定的三件事）；体检加一条核对 SKILLS.md 覆盖全部工具 |
+| 为什么 | 主人：加上修改头像、签名等技能，一样的原则她自己愿意就换；docs 里缺一份能读的手清单 |
+| 谁提的 | 我（DS） |
+| 怎么退 | 删 lib/profile.mjs 与四只工具定义；删 docs/SKILLS.md |
+| 影响 | 她会知道自己能改资料（技能清单里写了）；签名接口实测有一次 OIDB 999 失败，见报告 |
+| 提交 | ea84854 |

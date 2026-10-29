@@ -266,6 +266,21 @@ for (let i = 0; i < comps.length; i += 2) {
   }
 }
 
+// 她的手必须有一份能读的清单，且和工具表一致（2026-10-30 加）
+{
+  const doc = path.join(HER, 'docs', 'SKILLS.md')
+  const tc = readSrc('lib/toolcall.mjs')
+  const names = [...tc.matchAll(/name: '(\w+)',\s*\n\s*description:/g)].map((m) => m[1])
+  if (!fs.existsSync(doc)) W('没有 docs/SKILLS.md：她有哪些手没有一份能读的清单')
+  else if (!names.length) W('工具表解析不出名字（格式变了？）')
+  else {
+    const text = fs.readFileSync(doc, 'utf8')
+    const missing = names.filter((n) => !text.includes(n))
+    if (!missing.length) Y(`docs/SKILLS.md 覆盖全部 ${names.length} 只手`)
+    else W(`docs/SKILLS.md 少了 ${missing.length} 只：${missing.slice(0, 3).join('、')}`)
+  }
+}
+
 // 联系 DS 的通道必须带身份校验（不是靠她自己判断）
 {
   const tc = readSrc('lib/toolcall.mjs')
