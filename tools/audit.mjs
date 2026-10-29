@@ -197,6 +197,26 @@ for (let i = 0; i < comps.length; i += 2) {
   if (hasLib && reached) Y('空间的手都接上了：' + defined.length + ' 只工具 / ' + implemented.length + ' 个实现，不设审批门')
   else W('空间入口不完整：工具 ' + defined.length + '/5，实现 ' + implemented.length + ' 个')
 }
+// 改动单必须有对应的通知（她的要求：不判断"算不算她能感知的"，有就投）
+{
+  const doc = path.join(HER, 'docs', 'CHANGES.md')
+  let heads = []
+  try {
+    heads = fs.readFileSync(doc, 'utf8').split('\n').filter((l) => /^## \d{4}-/.test(l)).map((l) => l.replace(/^## \d{4}-\d\d-\d\d \d\d:\d\d\s*/, '').trim())
+  } catch { /* 没有改动单 */ }
+  if (!heads.length) Y('改动单是空的（最近没有改动需要通知）')
+  else {
+    let inboxText = ''
+    try {
+      inboxText = fs.readFileSync(path.join(HER, 'life', 'inbox.jsonl'), 'utf8').split('\n').filter(Boolean)
+        .map((l) => { try { return String(JSON.parse(l).text ?? '') } catch { return '' } }).join('\n')
+    } catch { /* 没投过 */ }
+    const missing = heads.filter((h) => !inboxText.includes(h))
+    if (!missing.length) Y(`改动单 ${heads.length} 条，每条都有通知`)
+    else W(`改动单有 ${missing.length} 条没通知她：${missing.slice(0, 2).join('；').slice(0, 40)}`)
+  }
+}
+
 // 联系 DS 的通道必须带身份校验（不是靠她自己判断）
 {
   const tc = readSrc('lib/toolcall.mjs')
