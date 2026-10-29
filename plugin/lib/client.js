@@ -845,6 +845,16 @@ window.__ModuleLoader__.load({
       const cur = rows.find((r) => r.key === view)
       // 顺序跟 QQ 一致：上旧下新（以前 reverse 过，看起来像倒着长）
       const msgs = view === 'list' ? [] : all.filter((x) => keyOf(x) === view)
+      // 进来先贴底（显示最新的），对应 QQ 的观感。
+      // 不用 ref：这个运行时不一定支持，直接在 effect 里找 DOM。
+      useEffect(() => {
+        if (view === 'list') return
+        const el = document.querySelector('.dshell-card .dlive .msgs')
+        if (!el) return
+        const first = !el.dataset.seen || el.dataset.seen !== view
+        const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80
+        if (first || nearBottom) { el.scrollTop = el.scrollHeight; el.dataset.seen = view }
+      }, [view, msgs.length])
       // 时间分隔条：相邻两条隔了 10 分钟以上（或跨天）就插一个时间，像 QQ 一样
       const rowsWithSep = []
       msgs.forEach((x, k) => {
@@ -928,7 +938,7 @@ window.__ModuleLoader__.load({
           head(cur ? (cur.key.startsWith('qq:group:') ? `群 ${cur.group || ''}` : (cur.name || '会话')) : '会话', `${msgs.length} 条`),
           err ? h('div', { className: 'err' }, err) : null,
           !msgs.length ? h('div', { className: 'empty' }, '这条会话还没有内容。') : null,
-          h('div', { className: 'msgs', ref: (el) => { if (el && (el.dataset.pin !== '0' || el.scrollTop + el.clientHeight >= el.scrollHeight - 60)) { el.scrollTop = el.scrollHeight; el.dataset.pin = '1' } } },
+          h('div', { className: 'msgs' },
           rowsWithSep.map((x) => {
             if (x.sep) {
               const t = String(x.at).slice(11, 16)
