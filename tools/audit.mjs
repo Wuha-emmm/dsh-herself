@@ -174,6 +174,14 @@ for (let i = 0; i < comps.length; i += 2) {
   if (hasLib && wired) Y('事实有预算（超了按优先级丢，核心永不丢）')
   else W('事实没预算：再加两类就会挤掉"最近"')
 }
+// 推理预算：thinking 的 token 也算在 max_tokens 里，600 会被"想"吃光
+{
+  const tc = readSrc('lib/toolcall.mjs')
+  const m = tc.match(/max_tokens:\s*(\d+)/)
+  const cap = m ? Number(m[1]) : 0
+  if (cap >= 1200) Y(`推理+输出共用预算 ${cap}（600 时她想过 564 字，话说一半就断了）`)
+  else W(`max_tokens=${cap} 太小：reasoning 会把它吃光，回复被截断`)
+}
 // 孤儿写入口：存了却没人读（她的原则：读它的人还有她自己）
 {
   const files = ['lib', 'hands', 'plugin/lib', 'tools', '.']   // 根目录也要扫（cli.mjs 会读 writeState）
