@@ -5,7 +5,7 @@
 //
 // 所以「只注入现在算数的判断」是不够的——她得能看到自己改过口。
 import { factsOf } from '../lib/think.mjs'
-import { recordReason } from '../lib/revision.mjs'
+import { recordReason, reasonOfIn } from '../lib/revision.mjs'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -63,6 +63,23 @@ const base = [
   recordReason(root, a.id, why)
   const line = factsOf(readEvents(root), now, '', 'qq:private:10001').out.find((x) => x.includes('改过口'))
   ok(String(line || '').includes(why), '她填的理由原话，一个字不走样地读得回来', String(line || '').slice(0, 80))
+  fs.rmSync(root, { recursive: true, force: true })
+}
+
+
+{
+  // 她的怀疑：是读的时候截的，还是写的时候就压了？——两边都不许压。
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'longwhy-'))
+  const { appendEvent, readEvents } = await import('../lib/store.mjs')
+  const seed = appendEvent(root, { type: 'seed', actor: 'system', surface: 'system', text: '她醒了' })
+  const a = appendEvent(root, { type: 'claim', actor: 'self', surface: 'qq', text: '只留总结不留原始记录，条目会越攒越像档案', refs: [seed.id], evidence: [seed.id] })
+  appendEvent(root, { type: 'claim', actor: 'self', surface: 'qq', text: '只留总结不留原始记录，条目会越攒越像档案了', refs: [seed.id], evidence: [seed.id] })
+  const longWhy = '因为只留总结的话，我过两天就只记得标签，记不得标签背后是什么了。'.repeat(12)   // 约 500 字
+  recordReason(root, a.id, longWhy)
+  const back = reasonOfIn(root, a.id)
+  ok(back === longWhy, '长理由存入不被截断、读出也不被截断', String(back.length) + ' 字')
+  const line = factsOf(readEvents(root), now, '', 'qq:private:10001').out.find((x) => x.includes('改过口'))
+  ok(String(line || '').includes(longWhy), '长理由也能完整进到她眼前')
   fs.rmSync(root, { recursive: true, force: true })
 }
 
