@@ -12,7 +12,7 @@
 // 用法：
 //   node tools/effort.mjs                      # 看现在多少
 //   node tools/effort.mjs max                  # 全局设成 max
-//   node tools/effort.mjs low --thread qq:private:REDACTED_QQ
+//   node tools/effort.mjs low --thread qq:private:10001
 //   node tools/effort.mjs clear                # 撤回全局设置（回到默认 low）
 import { readEvents, appendEvent } from '../lib/store.mjs'
 import { liveEvents } from '../lib/derive.mjs'

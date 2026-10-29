@@ -101,7 +101,7 @@ Get-Content E:\DSH-herself\logs\trace.jsonl -Tail 1
 
 这个仓库默认不进版本库的部分已在 `.gitignore` 里。如果要把代码公开，还要过一遍：
 
-1. **注释里的真实账号/群号**：`grep -rn "REDACTED_QQ\|647334703\|1713180193" lib hands tools plugin`
+1. **注释里的真实账号/群号**：`grep -rn "10001\|20002\|30003" lib hands tools plugin`
 2. **她的原话**：注释里引用了不少她的原话（这是设计依据，但也是私人对话）
 3. `HANDOFF.md`：开发日志，含大量真实场景，建议不放公开仓库（或另建 `docs/PROJECT-LOG.md` 摘要版）
 

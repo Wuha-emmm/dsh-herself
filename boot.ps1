@@ -16,7 +16,7 @@ $logs = Join-Path $root 'logs'
 $node = 'C:\Users\Administrator\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe'
 $napcatDir = Join-Path $root 'NapCat.Shell.Windows.OneKey\NapCat.52230.Shell'
 $napcatExe = Join-Path $napcatDir 'NapCatWinBootMain.exe'
-$qqUin = '1713180193'
+$qqUin = '30003'
 $pidFile = Join-Path $logs 'pids.json'
 
 New-Item -ItemType Directory -Force -Path $logs | Out-Null

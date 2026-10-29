@@ -38,12 +38,12 @@ for (let i = 0; i < 60; i += 1) {
 }
 
 // 目标事件：一条很久以前的（三个月前），带专名
-const oldOne = ev('2026-07-02T21:00:00+08:00', 'encounter', '呜哈：杭州那家河岸书店的猫还在窗台上睡着，我拍了张照。')
+const oldOne = ev('2026-07-02T21:00:00+08:00', 'encounter', '主人：杭州那家河岸书店的猫还在窗台上睡着，我拍了张照。')
 // 最近的一条，同样带专名
-const newOne = ev('2026-10-01T20:00:00+08:00', 'encounter', '呜哈：周末去看那个机械臂展会，人挺多。')
+const newOne = ev('2026-10-01T20:00:00+08:00', 'encounter', '主人：周末去看那个机械臂展会，人挺多。')
 // 两条完全一样的话（重复）
-const dupA = ev('2026-10-02T10:00:00+08:00', 'encounter', '呜哈：那台老式打字机修好了。')
-const dupB = ev('2026-10-02T10:05:00+08:00', 'encounter', '呜哈：那台老式打字机修好了。')
+const dupA = ev('2026-10-02T10:00:00+08:00', 'encounter', '主人：那台老式打字机修好了。')
+const dupB = ev('2026-10-02T10:05:00+08:00', 'encounter', '主人：那台老式打字机修好了。')
 
 const events = [...filler, oldOne, newOne, dupA, dupB]
 const index = buildIndex(events)
@@ -93,9 +93,9 @@ console.log(`语料：${index.total} 条，平均 ${index.avgdl.toFixed(1)} toke
 
 // ---------------------------------------------------------------- ④ 上限
 {
-  const r = search(index, '呜哈那台打字机修好了', { maxItems: 1 })
+  const r = search(index, '主人那台打字机修好了', { maxItems: 1 })
   ok(r.items.length <= 1, '条数上限生效', String(r.items.length))
-  const r2 = search(index, '呜哈那台打字机修好了', { maxChars: 10 })
+  const r2 = search(index, '主人那台打字机修好了', { maxChars: 10 })
   ok(r2.items.every((x) => x.text.length <= 10) || r2.items.length === 0, '字数上限：超了就不塞', JSON.stringify(r2.items.map((x) => x.text.length)))
 }
 

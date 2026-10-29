@@ -14,24 +14,24 @@ const ok = (cond, label, extra = '') => {
 
 // ---------------------------------------------------------------- 取谁的
 {
-  const u = targetOf({ uin: 'REDACTED_QQ' })
-  ok(u.ok && u.url.includes('nk=REDACTED_QQ'), '私聊：拼出个人头像地址', u.url)
-  ok(u.key === 'user-REDACTED_QQ', '缓存键按人分开', u.key)
+  const u = targetOf({ uin: '10001' })
+  ok(u.ok && u.url.includes('nk=10001'), '私聊：拼出个人头像地址', u.url)
+  ok(u.key === 'user-10001', '缓存键按人分开', u.key)
 
-  const g = targetOf({ group: '647334703' })
-  ok(g.ok && g.url.startsWith('https://p.qlogo.cn/gh/647334703/'), '群：拼出群头像地址', g.url)
+  const g = targetOf({ group: '20002' })
+  ok(g.ok && g.url.startsWith('https://p.qlogo.cn/gh/20002/'), '群：拼出群头像地址', g.url)
   ok(g.kind === 'group', '标出这是群头像')
 
   ok(!targetOf({ uin: 'abc' }).ok, 'QQ 号不是数字就不取（防止拼出任意的 URL）')
   ok(!targetOf({ uin: '123' }).ok, '太短的不当 QQ 号')
   ok(!targetOf({}).ok, '什么都没给就不取')
-  ok(targetOf({ group: '647334703', uin: '1' }).kind === 'group', '群优先（群聊里显示群头像）')
+  ok(targetOf({ group: '20002', uin: '1' }).kind === 'group', '群优先（群聊里显示群头像）')
 }
 
 // ---------------------------------------------------------------- 从会话 key 拆
 {
-  ok(JSON.stringify(fromThreadKey('qq:private:REDACTED_QQ')) === '{"uin":"REDACTED_QQ"}', '私聊 key → uin')
-  ok(JSON.stringify(fromThreadKey('qq:group:647334703')) === '{"group":"647334703"}', '群 key → group')
+  ok(JSON.stringify(fromThreadKey('qq:private:10001')) === '{"uin":"10001"}', '私聊 key → uin')
+  ok(JSON.stringify(fromThreadKey('qq:group:20002')) === '{"group":"20002"}', '群 key → group')
   ok(fromThreadKey('__legacy') === null && fromThreadKey('') === null, '老数据/空 key 不硬拆')
 }
 

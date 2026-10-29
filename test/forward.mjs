@@ -27,11 +27,11 @@ const img = (u) => ({ type: 'image', data: { url: u, file: 'a.jpg' } })
 // ---------------------------------------------------------------- 基本
 {
   const r = renderForwardNodes([
-    node('呜哈', [txt('今天真冷')]),
+    node('主人', [txt('今天真冷')]),
     node('困', [txt('是啊'), txt('早上还下雨')]),
   ])
   ok(r.lines.length === 2, '两条各一行', String(r.lines.length))
-  ok(r.lines[0] === '呜哈：今天真冷', '格式是「谁：说了什么」', r.lines[0])
+  ok(r.lines[0] === '主人：今天真冷', '格式是「谁：说了什么」', r.lines[0])
   ok(r.lines[1].includes('是啊早上还下雨'), '同一人多段文字拼起来', r.lines[1])
 }
 

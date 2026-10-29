@@ -15,12 +15,12 @@ const ok = (cond, label, extra = '') => {
 }
 
 const now = Date.parse('2026-10-29T14:00:00+08:00')
-const P = 'qq:private:REDACTED_QQ'
+const P = 'qq:private:10001'
 
 function mk(ts, i, type, extra = {}) {
   return {
     v: 1, id: ulidAt(Date.parse(ts), i + 1), ts, life: 'life_t', surface: extra.surface ?? 'qq', type,
-    actor: extra.actor ?? (type === 'utterance' ? 'self' : type === 'seed' ? 'system' : 'other:qq_REDACTED_QQ'),
+    actor: extra.actor ?? (type === 'utterance' ? 'self' : type === 'seed' ? 'system' : 'other:qq_10001'),
     acl: { visibility: 'private' },
     ...(extra.text !== undefined ? { text: extra.text } : {}),
     ...(extra.refs ? { refs: extra.refs } : {}),
@@ -30,11 +30,11 @@ function mk(ts, i, type, extra = {}) {
 
 const events = [
   mk('2026-10-29T09:00:00+08:00', 0, 'seed', { actor: 'system', surface: 'dsh' }),
-  mk('2026-10-29T13:30:00+08:00', 1, 'encounter', { text: '呜哈：在吗', meta: { qq: { senderId: 'REDACTED_QQ', groupId: '', private: true } } }),
+  mk('2026-10-29T13:30:00+08:00', 1, 'encounter', { text: '主人：在吗', meta: { qq: { senderId: '10001', groupId: '', private: true } } }),
   mk('2026-10-29T13:30:10+08:00', 2, 'utterance', { text: '在。', meta: {} }),
-  mk('2026-10-29T13:31:00+08:00', 3, 'encounter', { text: '呜哈：这个问题答过了吗', meta: { qq: { senderId: 'REDACTED_QQ', groupId: '', private: true } } }),
+  mk('2026-10-29T13:31:00+08:00', 3, 'encounter', { text: '主人：这个问题答过了吗', meta: { qq: { senderId: '10001', groupId: '', private: true } } }),
   mk('2026-10-29T13:31:10+08:00', 4, 'utterance', { text: '答过了，你刚问的。', meta: { thread: P } }),
-  mk('2026-10-29T13:32:00+08:00', 5, 'encounter', { text: '呜哈：那再来一次', meta: { qq: { senderId: 'REDACTED_QQ', groupId: '', private: true } } }),
+  mk('2026-10-29T13:32:00+08:00', 5, 'encounter', { text: '主人：那再来一次', meta: { qq: { senderId: '10001', groupId: '', private: true } } }),
 ]
 // 老事件没有 meta.thread，靠 refs 找回自己当时在回谁：
 // 她说的话指向触发它的那条 encounter（这正是 think() 从 causeId 写进去的东西）
@@ -63,7 +63,7 @@ ok(/在。/.test(recentLine) || /答过了/.test(recentLine), '说过的内容�
 
 // ---------------------------------------------------------------- 群聊不串台
 {
-  const g = mk('2026-10-29T13:33:00+08:00', 9, 'encounter', { text: '[群 647334703] 某人：群里的消息', meta: { qq: { senderId: '1', groupId: '647334703' } } })
+  const g = mk('2026-10-29T13:33:00+08:00', 9, 'encounter', { text: '[群 20002] 某人：群里的消息', meta: { qq: { senderId: '1', groupId: '20002' } } })
   const mixed = [...events, g]
   const pv = pickRecent(mixed, 6, P, indexById(mixed))
   ok(!pv.some((e) => e.id === g.id), '群聊消息不会混进私聊窗口')
@@ -74,7 +74,7 @@ ok(/在。/.test(recentLine) || /答过了/.test(recentLine), '说过的内容�
   // 冷线：摘要之后没再说话 → 该念（这是「上次聊到」的用处）
   const cold = [
     mk('2026-10-29T09:00:00+08:00', 0, 'seed', { actor: 'system', surface: 'dsh' }),
-    mk('2026-10-29T09:10:00+08:00', 1, 'encounter', { text: '呜哈：我们先聊到这', meta: { qq: { senderId: 'REDACTED_QQ', groupId: '', private: true } } }),
+    mk('2026-10-29T09:10:00+08:00', 1, 'encounter', { text: '主人：我们先聊到这', meta: { qq: { senderId: '10001', groupId: '', private: true } } }),
     mk('2026-10-29T09:30:00+08:00', 2, 'summary', { text: '我们说好下次接着聊那个方案。', meta: { thread: P } }),
   ]
   const a = factsOf(cold, Date.parse('2026-10-29T14:00:00+08:00'), '', P).out
@@ -83,7 +83,7 @@ ok(/在。/.test(recentLine) || /答过了/.test(recentLine), '说过的内容�
   // 热线：摘要之后又说了话 → 不该念（否则旧意图会覆盖新事实）
   const hot = [
     ...cold,
-    mk('2026-10-29T09:40:00+08:00', 3, 'encounter', { text: '呜哈：我回来了', meta: { qq: { senderId: 'REDACTED_QQ', groupId: '', private: true } } }),
+    mk('2026-10-29T09:40:00+08:00', 3, 'encounter', { text: '主人：我回来了', meta: { qq: { senderId: '10001', groupId: '', private: true } } }),
   ]
   const b = factsOf(hot, Date.parse('2026-10-29T14:00:00+08:00'), '', P).out
   ok(!b.some((l) => l.startsWith('你们上次聊到：')), '摘要之后又说过话：不再念旧摘要（2026-10-29 实测她因此又去追已了结的事）')

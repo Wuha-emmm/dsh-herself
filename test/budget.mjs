@@ -79,7 +79,7 @@ const ok = (cond, label, extra = '') => {
   const root = 'E:/DSH-herself/life'
   if (fs.existsSync(root + '/events.jsonl')) {
     const ev = readEvents(root)
-    const r = factsOf(ev, Date.now(), '', 'qq:private:REDACTED_QQ')
+    const r = factsOf(ev, Date.now(), '', 'qq:private:10001')
     ok(r.budget.used <= FACT_BUDGET, '她的真实一轮在预算内', `${r.budget.used}/${FACT_BUDGET}`)
     ok(r.out.length >= 3, '至少留下核心 + 最近 + 判断', String(r.out.length))
     ok(r.out[0].includes('第 1 天'), '第一行永远是"第几天"')

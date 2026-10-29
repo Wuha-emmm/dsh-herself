@@ -30,3 +30,4 @@ node_modules/
 # 本地环境
 .env
 *.local
+docs/深度分析-2026-10-29.md

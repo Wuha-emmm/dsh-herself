@@ -70,10 +70,10 @@ const at = (s) => Date.parse(s)
   }
   const events = [
     ev('2026-10-29T09:00:00+08:00', 'seed', '', { actor: 'system', surface: 'dsh' }),
-    ev('2026-10-29T14:20:00+08:00', 'encounter', '呜哈：你还记得我啥时候说要去睡觉的吗', { meta: { qq: { senderId: 'REDACTED_QQ', groupId: '' } } }),
-    ev('2026-10-29T14:43:00+08:00', 'encounter', '呜哈：那个鲸鱼娘的图你还记得吗', { meta: { qq: { senderId: 'REDACTED_QQ', groupId: '' } } }),
+    ev('2026-10-29T14:20:00+08:00', 'encounter', '主人：你还记得我啥时候说要去睡觉的吗', { meta: { qq: { senderId: '10001', groupId: '' } } }),
+    ev('2026-10-29T14:43:00+08:00', 'encounter', '主人：那个鲸鱼娘的图你还记得吗', { meta: { qq: { senderId: '10001', groupId: '' } } }),
   ]
-  const { out } = factsOf(events, at('2026-10-29T14:52:00+08:00'), '那个鲸鱼娘的图', 'qq:private:REDACTED_QQ')
+  const { out } = factsOf(events, at('2026-10-29T14:52:00+08:00'), '那个鲸鱼娘的图', 'qq:private:10001')
   ok(/现在是 10 月 29 日下午 2:52/.test(out[0]), '第一行告诉她现在几点', out[0])
   ok(/最早一件事是/.test(out[0]), '第一行还告诉她最早记得什么', out[0])
   ok(out[1].startsWith('时间按北京时间算'), '第二行是刻度', out[1])

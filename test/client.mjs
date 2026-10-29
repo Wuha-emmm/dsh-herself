@@ -88,10 +88,10 @@ ok(cls(page) === 'dlive listv', '默认进的是会话列表（不是把所有�
 const data = {
   ok: true, traced: 2,
   turns: [
-    { id: 'E1', ts: '2026-10-29T14:00:00+08:00', type: 'encounter', who: 'REDACTED_QQ', group: '', thread: 'qq:private:REDACTED_QQ', text: '呜哈：他在吗', trace: null },
-    { id: 'U1', ts: '2026-10-29T14:00:10+08:00', type: 'utterance', who: '她', group: '', thread: 'qq:private:REDACTED_QQ', text: '在。', trace: { reasoning: 120, tools: 1, tokens: 60 } },
-    { id: 'E2', ts: '2026-10-29T14:05:00+08:00', type: 'encounter', who: '777', group: '647334703', thread: 'qq:group:647334703', text: '[群 647334703] 困：@她 看戏', trace: null },
-    { id: 'U2', ts: '2026-10-29T14:05:10+08:00', type: 'utterance', who: '她', group: '647334703', thread: 'qq:group:647334703', text: '票钱还没谈呢。', trace: null },
+    { id: 'E1', ts: '2026-10-29T14:00:00+08:00', type: 'encounter', who: '10001', group: '', thread: 'qq:private:10001', text: '主人：他在吗', trace: null },
+    { id: 'U1', ts: '2026-10-29T14:00:10+08:00', type: 'utterance', who: '她', group: '', thread: 'qq:private:10001', text: '在。', trace: { reasoning: 120, tools: 1, tokens: 60 } },
+    { id: 'E2', ts: '2026-10-29T14:05:00+08:00', type: 'encounter', who: '777', group: '20002', thread: 'qq:group:20002', text: '[群 20002] 困：@她 看戏', trace: null },
+    { id: 'U2', ts: '2026-10-29T14:05:10+08:00', type: 'utterance', who: '她', group: '20002', thread: 'qq:group:20002', text: '票钱还没谈呢。', trace: null },
   ],
 }
 // 列表视图：data / err / 'list' / sel
@@ -105,8 +105,8 @@ const rowNames = trows.map((r) => {
   const el = walk(r).find((c) => cls(c) === 'trow-name')
   return String(el?.children?.[0] ?? '')
 })
-ok(rowNames.some((n) => n.includes('呜哈')), '私聊那行显示的是对方名字', JSON.stringify(rowNames))
-ok(rowNames.some((n) => n.includes('647334703')), '群那行显示的是群号', JSON.stringify(rowNames))
+ok(rowNames.some((n) => n.includes('主人')), '私聊那行显示的是对方名字', JSON.stringify(rowNames))
+ok(rowNames.some((n) => n.includes('20002')), '群那行显示的是群号', JSON.stringify(rowNames))
 const counts = trows.map((r) => {
   const el = walk(r).find((c) => cls(c) === 'trow-count')
   return String(el?.children?.[0] ?? '')
@@ -121,7 +121,7 @@ ok(Boolean(walk(trows[0]).find((c) => cls(c).includes('trow-ava'))), '每行左�
 
 // ---------------------------------------------------------------- 渲染：进到某条会话（三级导航的第二级）
 {
-  stateQueue = [data, '', 'qq:private:REDACTED_QQ', '']
+  stateQueue = [data, '', 'qq:private:10001', '']
   const conv = captured.LivePage()
   ok(cls(conv) === 'dlive', '会话页根节点是 dlive', cls(conv))
   const feedC = walk(conv).find((c) => cls(c) === 'feed')
@@ -138,7 +138,7 @@ ok(Boolean(walk(trows[0]).find((c) => cls(c).includes('trow-ava'))), '每行左�
 
 // ---------------------------------------------------------------- 渲染：点开某一轮（第三级，占满整卡）
 {
-  stateQueue = [data, '', 'qq:private:REDACTED_QQ', 'U1']
+  stateQueue = [data, '', 'qq:private:10001', 'U1']
   const turn = captured.LivePage()
   const backBtn = walk(turn).find((c) => cls(c) === 'back')
   ok(Boolean(backBtn) && typeof backBtn.props.onClick === 'function', '这一层有 ← 返回对话')

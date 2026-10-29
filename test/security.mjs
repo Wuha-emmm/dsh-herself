@@ -35,7 +35,7 @@ const CLEAN = [
   '表情 id 是 0a1b2c3d4e5f60718293a4b5c6d7e8f9',
   '群号 935190036，你看这个',
   '我这边只有这个文件夹的权限',
-  'QQ 号 REDACTED_QQ',
+  'QQ 号 10001',
 ]
 for (const s of CLEAN) ok(!looksSecret(s).length, `不误杀：${s.slice(0, 14)}`, looksSecret(s).join('/'))
 

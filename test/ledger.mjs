@@ -13,7 +13,7 @@ const ok = (cond, label, extra = '') => {
 
 const now = Date.parse('2026-10-29T23:00:00+08:00')
 const ev = (ts, type, text, extra = {}) => ({ type, ts, text, ...extra })
-const him = (ts, text) => ev(ts, 'encounter', `呜哈：${text}`, { meta: { qq: { senderId: '1', groupId: '' } } })
+const him = (ts, text) => ev(ts, 'encounter', `主人：${text}`, { meta: { qq: { senderId: '1', groupId: '' } } })
 const grp = (ts, text) => ev(ts, 'encounter', `[群 9] 某人：${text}`, { meta: { qq: { senderId: '2', groupId: '9' } } })
 
 // ---------------------------------------------------------------- 要睡没睡
@@ -27,7 +27,7 @@ const grp = (ts, text) => ev(ts, 'encounter', `[群 9] 某人：${text}`, { meta
   const r = candidates(day, now)
   ok(r.length === 1 && r[0].kind === 'sleep', '说了要睡又冒出来好几次 → 记一条', JSON.stringify(r.map((x) => x.kind)))
   ok(/^之后又来了 3 次$/.test(r[0].why), '理由只摆事实，不加解释', r[0].why)
-  ok(!/呜哈：/.test(r[0].text), '正文去掉「谁：」前缀', r[0].text)
+  ok(!/主人：/.test(r[0].text), '正文去掉「谁：」前缀', r[0].text)
 }
 
 {
@@ -94,10 +94,10 @@ const grp = (ts, text) => ev(ts, 'encounter', `[群 9] 某人：${text}`, { meta
   ok(!/要记|应该|记得|别忘|待办|务必/.test(empty), '空的时候没有任何催促词')
 
   const some = ledgerReply(candidates([
-    ev('2026-10-29T22:00:00+08:00', 'encounter', '呜哈：去睡了', { meta: { qq: { senderId: '1', groupId: '' } } }),
-    ev('2026-10-29T22:05:00+08:00', 'encounter', '呜哈：再看一眼', { meta: { qq: { senderId: '1', groupId: '' } } }),
-    ev('2026-10-29T22:06:00+08:00', 'encounter', '呜哈：还有', { meta: { qq: { senderId: '1', groupId: '' } } }),
-    ev('2026-10-29T22:07:00+08:00', 'encounter', '呜哈：最后一句', { meta: { qq: { senderId: '1', groupId: '' } } }),
+    ev('2026-10-29T22:00:00+08:00', 'encounter', '主人：去睡了', { meta: { qq: { senderId: '1', groupId: '' } } }),
+    ev('2026-10-29T22:05:00+08:00', 'encounter', '主人：再看一眼', { meta: { qq: { senderId: '1', groupId: '' } } }),
+    ev('2026-10-29T22:06:00+08:00', 'encounter', '主人：还有', { meta: { qq: { senderId: '1', groupId: '' } } }),
+    ev('2026-10-29T22:07:00+08:00', 'encounter', '主人：最后一句', { meta: { qq: { senderId: '1', groupId: '' } } }),
   ], now))
   ok(!/要记|应该|记得|别忘|待办|务必/.test(some), '有候选时也不催、不给建议', some)
   ok(/可能值得记/.test(some), '只是摆出来，语气是"可能"', some)
@@ -107,10 +107,10 @@ const grp = (ts, text) => ev(ts, 'encounter', `[群 9] 某人：${text}`, { meta
 {
   // 她的原话：「明早我把误收的原文列给你，能改就改，改不了就先关掉那一类。」
   const day = [
-    ev('2026-10-29T22:00:00+08:00', 'encounter', '呜哈：去睡了', { meta: { qq: { senderId: '1', groupId: '' } } }),
-    ev('2026-10-29T22:05:00+08:00', 'encounter', '呜哈：再看一眼', { meta: { qq: { senderId: '1', groupId: '' } } }),
-    ev('2026-10-29T22:06:00+08:00', 'encounter', '呜哈：还有', { meta: { qq: { senderId: '1', groupId: '' } } }),
-    ev('2026-10-29T22:07:00+08:00', 'encounter', '呜哈：最后一句', { meta: { qq: { senderId: '1', groupId: '' } } }),
+    ev('2026-10-29T22:00:00+08:00', 'encounter', '主人：去睡了', { meta: { qq: { senderId: '1', groupId: '' } } }),
+    ev('2026-10-29T22:05:00+08:00', 'encounter', '主人：再看一眼', { meta: { qq: { senderId: '1', groupId: '' } } }),
+    ev('2026-10-29T22:06:00+08:00', 'encounter', '主人：还有', { meta: { qq: { senderId: '1', groupId: '' } } }),
+    ev('2026-10-29T22:07:00+08:00', 'encounter', '主人：最后一句', { meta: { qq: { senderId: '1', groupId: '' } } }),
   ]
   ok(candidates(day, now).length === 1, '全开时有 1 条')
   ok(candidates(day, now, { off: ['sleep'] }).length === 0, '关掉 sleep 这一类就不收', String(candidates(day, now, { off: ['sleep'] }).length))
