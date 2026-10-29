@@ -80,6 +80,19 @@ const root = fs.mkdtempSync(path.join(os.tmpdir(), 'inbox-'))
   fs.rmSync(r2, { recursive: true, force: true })
 }
 
+
+// ---------------------------------------------------------------- 底层安全策略
+{
+  const { exec } = await import('../lib/toolcall.mjs')
+  const r3 = fs.mkdtempSync(path.join(os.tmpdir(), 'guard-'))
+  ok(String(await exec('ask_dsh', { text: '查代码' }, { root: r3, isOwner: false })).includes('只对主人开'), '陌生人投不出去')
+  ok(String(await exec('ask_dsh', { text: '查代码' }, { root: r3, isOwner: true, publicSurface: true })).includes('群里不'), '群里主人也投不出去')
+  ok(String(await exec('ask_dsh', { text: '查代码' }, { root: r3, isOwner: true })).includes('投出去了'), '私聊主人才放行')
+  for (let i = 0; i < 5; i += 1) await exec('ask_dsh', { text: '第' + i + '条' }, { root: r3, isOwner: true })
+  ok(String(await exec('ask_dsh', { text: '第七条' }, { root: r3, isOwner: true })).includes('上限'), '一小时 6 条上限', '第 7 条')
+  fs.rmSync(r3, { recursive: true, force: true })
+}
+
 fs.rmSync(root, { recursive: true, force: true })
 console.log(`\n${pass} 通过 / ${fail} 失败`)
 process.exit(fail ? 1 : 0)

@@ -182,6 +182,14 @@ for (let i = 0; i < comps.length; i += 2) {
   if (cap >= 4000) Y(`推理+输出共用预算 ${cap}（给到模型上限；600 时她想过 564 字，话说一半就断了）`)
   else W(`max_tokens=${cap} 太小：reasoning 会把它吃光，回复被截断`)
 }
+// 联系 DS 的通道必须带身份校验（不是靠她自己判断）
+{
+  const tc = readSrc('lib/toolcall.mjs')
+  const gated = /ctx\.isOwner/.test(tc) && /publicSurface/.test(tc) && /小时投得够多/.test(tc)
+  if (gated) Y('联系 DS 的通道有底层校验（只有主人 / 只在私聊 / 每小时 6 条）')
+  else W('ask_dsh 没有身份校验：谁都能把单子投给 DS')
+}
+
 // 孤儿写入口：存了却没人读（她的原则：读它的人还有她自己）
 {
   const files = ['lib', 'hands', 'plugin/lib', 'tools', '.']   // 根目录也要扫（cli.mjs 会读 writeState）

@@ -159,6 +159,14 @@ window.__ModuleLoader__.load({
         ),
 
         h('div', { className: 'card' },
+        h('div', { className: 'card' },
+          h('h3', {}, '谁能让我联系 DS'),
+          h('p', { className: 'sub' }, '这条通道不是对所有人开的。下面三条写死在代码里，不靠我临场判断：'),
+          h('div', { className: 'row' }, h('span', { className: 'chip on' }, '只有主人'), h('span', { style: { flex: 1 } }, '群里的人 @ 我、陌生人私聊我，都投不出去')),
+          h('div', { className: 'row' }, h('span', { className: 'chip on' }, '只在私聊'), h('span', { style: { flex: 1 } }, '群里一句话被截图转出去，等于把入口交出去')),
+          h('div', { className: 'row' }, h('span', { className: 'chip' }, '每小时 6 条'), h('span', { style: { flex: 1 } }, '防止被人反复诱导刷屏')),
+          h('p', { className: 'sub', style: { marginTop: 8 } }, '被挡住时我会直说「这条通道只对主人开」，不会假装没听见。'),
+        ),
           h('h3', {}, '四道门'),
           h('div', { style: { display: 'flex', gap: 6, flexWrap: 'wrap' } },
             ['trust', 'autonomy', 'competence', 'integration'].map((g) =>
