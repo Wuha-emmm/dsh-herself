@@ -56,15 +56,27 @@ if (cmd === 'mark') {
 }
 
 if (cmd === 'nomatch') {
-  // 抽查：随机捞几条 no_match，看她说的"无关"是不是真的一条都不沾
+  // 抽查：她说的「3 条不算验收」——样本少时随机 3 条抓不到误判。
+  // 默认抽一半（最少 5 条）；total<10 时明确警告"样本太少"。
   const picksAll = readLog().filter((x) => x.method === 'no_match')
-  if (!picksAll.length) { console.log('还没有 no_match 记录'); process.exit(0) }
-  const n = Number(idx) || 3
+  const total = picksAll.length
+  if (!total) { console.log('还没有 no_match 记录'); process.exit(0) }
+  const arg = String(idx ?? '').trim()
+  let n
+  if (arg === 'all') n = total
+  else if (arg && Number(arg) > 0) n = Math.min(total, Number(arg))
+  else n = Math.max(5, Math.ceil(total / 2))
+  if (total < 10) {
+    console.log(`⚠ 现在只有 ${total} 条 no_match：**样本太少，不能当验收**。`)
+    console.log('  建议攒到十几条再抽查（默认会抽一半，最少 5 条）。\n')
+  }
   const shuffled = [...picksAll].sort(() => Math.random() - 0.5).slice(0, n)
+  console.log(`抽查 ${shuffled.length} / ${total} 条（覆盖 ${Math.round((shuffled.length / total) * 100)}%）\n`)
   for (const p of shuffled) {
-    console.log('\n问：' + p.query + '（' + String(p.at).slice(5, 16) + '）')
+    console.log('问：' + p.query + '（' + String(p.at).slice(5, 16) + '）')
     console.log('  模型旁白：' + String(p.why ?? '').slice(0, 60) + '（线索，非证据）')
     for (const c of p.candidates ?? []) console.log('  · ' + String(c.text ?? c).slice(0, 60))
+    console.log('')
   }
   process.exit(0)
 }
