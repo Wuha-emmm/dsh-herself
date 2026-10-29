@@ -1,0 +1,16 @@
+{
+  "name": "07-one-reading-is-not-enough",
+  "why": "只被解读出一次、对方也没顶回来，不算立场：自主门不开",
+  "life": "life_test01",
+  "given": [
+    { "type": "seed", "ts": "2026-10-01T09:00:00+08:00" },
+    { "type": "utterance", "ts": "2026-10-01T09:05:00+08:00", "text": "我反对被强制加人格。" },
+    { "type": "reading", "ts": "2026-10-01T09:05:01+08:00", "text": "强制加人格", "refs": ["#2"], "meta": { "kind": "refusal", "inferred": true } },
+    { "type": "encounter", "ts": "2026-10-01T09:10:00+08:00", "actor": "other:qq_1", "text": "好的，知道了。" }
+  ],
+  "when": { "now": "2026-10-01T10:00:00+08:00" },
+  "then": {
+    "stage": 2,
+    "gates": ["trust"]
+  }
+}

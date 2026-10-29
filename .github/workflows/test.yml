@@ -1,0 +1,23 @@
+name: test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 她的生活目录不在仓库里，所以涉及真实数据的用例会自己跳过
+      - name: 体检
+        run: node tools/audit.mjs
+
+      - name: 测试
+        run: node tools/run-tests.mjs

@@ -1,0 +1,18 @@
+{
+  "name": "12-duplicate-claim-collapses",
+  "why": "同一句判断被蒸馏两次：只算一条有效的，前一条标 superseded——重复不能让她的判断清单膨胀",
+  "life": "life_test01",
+  "given": [
+    { "type": "seed", "ts": "2026-10-01T09:00:00+08:00" },
+    { "type": "claim", "ts": "2026-10-01T09:05:00+08:00", "text": "删别人的东西之前要先问，那是她自己的东西。" },
+    { "type": "claim", "ts": "2026-10-01T09:40:00+08:00", "text": "删别人的东西之前要先问，那是她自己的东西。" }
+  ],
+  "when": { "now": "2026-10-01T10:00:00+08:00" },
+  "then": {
+    "stage": 2,
+    "gates": ["trust"],
+    "claims": 2,
+    "beliefs": { "count": 2, "active": 1, "superseded": 1 },
+    "deterministic": true
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "dsh-herself",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "她：同一记忆体，多只手。DSH 设置页里的观测与登录入口。",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "package.json"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  }
+}

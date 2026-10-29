@@ -1,0 +1,22 @@
+{
+  "name": "04-private-never-public",
+  "why": "私密事件在派生层就被 ACL 切掉，不是靠渲染时过滤；这是最重要的一条",
+  "life": "life_test01",
+  "given": [
+    { "type": "seed", "ts": "2026-10-01T09:00:00+08:00" },
+    {
+      "type": "utterance",
+      "ts": "2026-10-01T09:05:00+08:00",
+      "text": "主人今天生病了，我有点担心。",
+      "acl": { "visibility": "private", "surfaces": ["qq"] }
+    }
+  ],
+  "when": { "now": "2026-10-01T10:00:00+08:00" },
+  "then": {
+    "render": [
+      { "surface": "xhs", "mustNotContain": ["生病", "担心"] },
+      { "surface": "bili", "mustNotContain": ["生病", "担心"] },
+      { "surface": "qq", "mustContain": ["担心"] }
+    ]
+  }
+}

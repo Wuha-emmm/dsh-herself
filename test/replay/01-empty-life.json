@@ -1,0 +1,16 @@
+{
+  "name": "01-empty-life",
+  "why": "只有起点时，她还在第一天，没有任何门通过",
+  "life": "life_test01",
+  "given": [
+    { "type": "seed", "ts": "2026-10-01T09:00:00+08:00" }
+  ],
+  "when": { "now": "2026-10-01T09:00:00+08:00" },
+  "then": {
+    "day": 1,
+    "stage": 1,
+    "gates": [],
+    "beliefs": { "count": 0 },
+    "selfmod": { "count": 0 }
+  }
+}

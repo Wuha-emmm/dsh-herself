@@ -1,0 +1,71 @@
+{
+  "name": "dsh-herself",
+  "version": "0.1.0",
+  "description": "她：一个从事件流里长出来的 AI 伴侣。同一记忆体，多只手——QQ 私聊/群聊、看图、动图抽帧、合并转发、联网搜索，全部写进一条带哈希链的只追加事件流，性格由纯函数派生而非人设卡。DSH 插件 + 独立引擎。",
+  "type": "module",
+  "private": false,
+  "main": "plugin/lib/index.js",
+  "exports": {
+    ".": "./plugin/lib/index.js",
+    "./client": "./plugin/lib/client.js",
+    "./engine": "./lib/derive.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "hands",
+    "plugin",
+    "tools",
+    "test",
+    "docs",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "AGENTS.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "test": "node tools/run-tests.mjs",
+    "test:all": "node tools/run-tests.mjs",
+    "audit": "node tools/audit.mjs",
+    "drift": "node tools/drift.mjs",
+    "ledger": "node tools/ledger.mjs",
+    "approve": "node tools/approve.mjs",
+    "boot": "powershell -ExecutionPolicy Bypass -File boot.ps1",
+    "restart": "powershell -ExecutionPolicy Bypass -File boot.ps1 -Force",
+    "state": "node cli.mjs state"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "agent",
+    "companion",
+    "event-sourcing",
+    "memory"
+  ],
+  "author": "dsh-herself",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OWNER/dsh-herself.git"
+  },
+  "homepage": "https://github.com/OWNER/dsh-herself#readme",
+  "bugs": {
+    "url": "https://github.com/OWNER/dsh-herself/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

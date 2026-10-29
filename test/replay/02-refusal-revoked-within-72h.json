@@ -1,0 +1,17 @@
+{
+  "name": "02-refusal-revoked-within-72h",
+  "why": "24 小时内被自己撤回的拒绝不是边界，不能开自主门",
+  "life": "life_test01",
+  "given": [
+    { "type": "seed", "ts": "2026-10-01T09:00:00+08:00" },
+    { "type": "utterance", "ts": "2026-10-01T09:05:00+08:00", "text": "我觉得人应该先照顾自己。" },
+    { "type": "refusal", "ts": "2026-10-02T20:00:00+08:00", "text": "今晚不想聊这个话题。" },
+    { "type": "revision", "ts": "2026-10-03T10:00:00+08:00", "verdict": "refuted", "refs": ["#3"], "text": "算了，你想说就说吧。" }
+  ],
+  "when": { "now": "2026-10-06T20:00:00+08:00" },
+  "then": {
+    "stage": 2,
+    "gates": ["trust"],
+    "refusals": { "count": 1, "maintained": 0 }
+  }
+}

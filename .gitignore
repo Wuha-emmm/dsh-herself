@@ -1,0 +1,32 @@
+# 她的私人数据 —— 一律不进版本库
+secrets/
+life/
+logs/
+sandbox/
+profile/
+_demo/
+HANDOFF.md
+
+# 第三方运行时 / 机器人框架（体积大、与代码无关）
+NapCat.Shell.Windows.OneKey/
+SnowLuma/
+
+# 运行时产物
+*.log
+*.bak
+*.bak-*
+_asar-hits.json
+_cand.json
+_web.js
+qrcode-now.png
+wake-state.json
+
+# 依赖与编辑器
+node_modules/
+.vscode/
+.idea/
+.DS_Store
+
+# 本地环境
+.env
+*.local

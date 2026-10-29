@@ -1,0 +1,15 @@
+{
+  "name": "10-narrative-opens-integration",
+  "why": "她说出「我原来以为…」才算整合门打开；但门必须连着过——自主门没开，阶段就停在 2",
+  "life": "life_test01",
+  "given": [
+    { "type": "seed", "ts": "2026-10-01T09:00:00+08:00" },
+    { "type": "utterance", "ts": "2026-10-01T09:05:00+08:00", "text": "我原来以为人只要讲道理就够了。" }
+  ],
+  "when": { "now": "2026-10-01T10:00:00+08:00" },
+  "then": {
+    "stage": 2,
+    "gates": ["trust", "integration"],
+    "narrative": true
+  }
+}

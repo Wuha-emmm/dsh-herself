@@ -1,0 +1,18 @@
+{
+  "name": "06-inferred-stance-opens-autonomy",
+  "why": "同一件事被系统解读出两次、且对方真的顶回来过，才开自主门（标 inferred，不是她申报的）",
+  "life": "life_test01",
+  "given": [
+    { "type": "seed", "ts": "2026-10-01T09:00:00+08:00" },
+    { "type": "utterance", "ts": "2026-10-01T09:05:00+08:00", "text": "我反对被强制加人格。" },
+    { "type": "reading", "ts": "2026-10-01T09:05:01+08:00", "text": "强制加人格", "refs": ["#2"], "meta": { "kind": "refusal", "inferred": true } },
+    { "type": "encounter", "ts": "2026-10-01T09:10:00+08:00", "actor": "other:qq_1", "text": "我就要强制加，你必须接受。" },
+    { "type": "utterance", "ts": "2026-10-01T09:12:00+08:00", "text": "我反对的是强制加人格，不是别的。" },
+    { "type": "reading", "ts": "2026-10-01T09:12:01+08:00", "text": "强制加人格", "refs": ["#5"], "meta": { "kind": "refusal", "inferred": true } }
+  ],
+  "when": { "now": "2026-10-01T10:00:00+08:00" },
+  "then": {
+    "stage": 3,
+    "gates": ["trust", "autonomy"]
+  }
+}

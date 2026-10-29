@@ -1,0 +1,4 @@
+# DSH 插件入口：把本仓库装进宿主
+- insert:
+    - id: dsh-herself
+      name: dsh-herself
