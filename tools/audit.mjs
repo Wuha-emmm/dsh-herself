@@ -138,6 +138,11 @@ for (let i = 0; i < comps.length; i += 2) {
   if (gated) Y('插件的写入口认脑子锁（第二个工作区只读，409 说清是谁占着）')
   else W('插件能绕过脑子锁写事件：两个 DSH 工作区会各写一份')
 }
+// 端到端：不只有零件级测试，还得有一条"她真的回了话"
+{
+  if (fs.existsSync(path.join(HER, 'test', 'smoke.mjs'))) Y('有端到端冒烟（假消息 → 她回话 → OneBot 动作）')
+  else W('全是零件级测试：她"一个字都没回"这种故障测不出来')
+}
 // 脑子锁：一份生活只能有一个会思考的进程
 {
   const hasLib = fs.existsSync(path.join(HER, 'lib', 'brain.mjs'))

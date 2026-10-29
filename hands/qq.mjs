@@ -84,7 +84,7 @@ function isSystemNotice(text, ev) {
 }
 
 /** 心跳：让面板知道这个进程还活着（DSH 沙箱里 process.kill(pid,0) 不可靠） */
-const HEARTBEAT = path.join(here, '..', 'logs', 'heartbeat-qq.txt')
+const HEARTBEAT = path.join(process.env.DSH_HERSELF_LOG_DIR || path.join(here, '..', 'logs'), 'heartbeat-qq.txt')
 function beat() {
   try {
     fs.mkdirSync(path.dirname(HEARTBEAT), { recursive: true })
@@ -124,7 +124,8 @@ export function recordMessage(ev, { root = ROOT } = {}) {
   return event
 }
 
-export function listen({ root = ROOT, reply = true } = {}) {
+export function listen({ root = ROOT, reply = true, chat = think, socket = null } = {}) {
+  // chat / socket 只给冒烟测试注入：生产路径两者都不传，行为完全不变。
   // 一个角色一个进程：撞车的那个安静退出（事故记在 lib/singleton.mjs 顶上）
   const slot = claimSlot('qq-listen')
   if (!slot.ok) {
@@ -314,7 +315,7 @@ export function listen({ root = ROOT, reply = true } = {}) {
           send: async (s) => sendStickerTo(isGroup ? 'group' : 'private', isGroup ? ev.group_id : senderId, s),
         }
         // 连着发了几句就告诉她，别把几件事混成一件事回（拼法在 lib/batch.mjs）
-        r = await think({
+        r = await chat({
           root,
           userText: composeUserText(batch.parts.map((x) => x.text)) + extra,
           who,
@@ -343,7 +344,7 @@ export function listen({ root = ROOT, reply = true } = {}) {
   // 断线自动重连：OneBot 运行时重启、被踢下线、网络抖动都不用人管
   const connect = () => {
     if (stopped) return
-    ws = open()
+    ws = socket ?? open()
     ws.addEventListener('open', () => {
       retry = 0
       console.log('[qq] 已连上 OneBot')
