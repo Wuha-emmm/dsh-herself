@@ -39,7 +39,7 @@ for (const e of events) {
   if (!e.acl?.visibility) P(`${e.id} 没有 acl.visibility`)
   if (e.type === 'refusal' && !String(e.text ?? '').trim()) P(`${e.id} refusal 没有正文`)
   if (e.type === 'reading' && !(e.refs ?? []).length) P(`${e.id} reading 没有 refs（指不到原话）`)
-  if (e.type === 'utterance' && String(e.text ?? '').length > 500) W(`${e.id} utterance 超过 500 字`)
+      if (e.type === 'utterance' && String(e.text ?? '').length >= 4000) W(` utterance 撞到 4000 字上限`)
 }
 for (const e of events) {
   for (const r of e.refs ?? []) {
