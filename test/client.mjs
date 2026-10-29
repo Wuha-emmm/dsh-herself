@@ -127,12 +127,16 @@ ok(Boolean(walk(trows[0]).find((c) => cls(c).includes('trow-ava'))), '每行左�
   const feedC = walk(conv).find((c) => cls(c) === 'feed')
   ok(Boolean(feedC), '会话页有一栏对话流')
   ok(!walk(conv).some((c) => cls(c) === 'detail'), '不再有挤在右边的第二栏（430px 放不下）')
-  const msgsC = walk(conv).filter((c) => cls(c).startsWith('msg'))
+  // 'msgs' 容器也会 startsWith('msg')，只认真正的消息行
+  const msgsC = walk(conv).filter((c) => cls(c).split(' ')[0] === 'msg')
   ok(msgsC.length === 2, '只显示这条会话的 2 条（群聊不串进来）', String(msgsC.length))
   const rightC = msgsC.find((r) => cls(r).includes('right'))
   const leftC = msgsC.find((r) => cls(r).includes('left'))
   ok(Boolean(rightC) && Boolean(leftC), '她的靠右、他的靠左')
   ok(cls(rightC?.children?.[0]).includes('bub her'), '她说的话是「她」的气泡')
+  ok(Boolean(walk(conv).find((c) => cls(c) === 'msgs')), '消息装在可滚动的容器里（才能贴底）')
+  const order = msgsC.map((r) => cls(r).includes('right') ? 'her' : 'him')
+  ok(order[0] === 'him' && order[1] === 'her', '顺序跟 QQ 一样：上旧下新', JSON.stringify(order))
   ok(/思考 120 字/.test(String(walk(rightC).find((c) => cls(c) === 'badge')?.children?.[0] ?? '')), '气泡里带「思考 N 字」')
 }
 

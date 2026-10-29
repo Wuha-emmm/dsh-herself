@@ -532,6 +532,7 @@ window.__ModuleLoader__.load({
         .dlive .feed{width:100%;max-height:42vh}
         .dlive .detail{max-height:none;width:100%}
       }
+      .dlive .msgs{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:2px}
       .dlive .msg{display:flex;margin-bottom:10px}
       .dlive .msg.left{justify-content:flex-start}
       .dlive .msg.right{justify-content:flex-end}
@@ -841,7 +842,8 @@ window.__ModuleLoader__.load({
       const keyOf = (x) => keyById.get(x.id) ?? liveKey(x)
       const rows = threadRows(all, keyOf)
       const cur = rows.find((r) => r.key === view)
-      const msgs = view === 'list' ? [] : all.filter((x) => keyOf(x) === view).slice().reverse()
+      // 顺序跟 QQ 一致：上旧下新（以前 reverse 过，看起来像倒着长）
+      const msgs = view === 'list' ? [] : all.filter((x) => keyOf(x) === view)
 
       const back = () => { setView('list'); setSel('') }
       const head = (title, right) => h('div', { className: 'page-h' },
@@ -916,6 +918,7 @@ window.__ModuleLoader__.load({
           head(cur ? (cur.key.startsWith('qq:group:') ? `群 ${cur.group || ''}` : (cur.name || '会话')) : '会话', `${msgs.length} 条`),
           err ? h('div', { className: 'err' }, err) : null,
           !msgs.length ? h('div', { className: 'empty' }, '这条会话还没有内容。') : null,
+          h('div', { className: 'msgs', ref: (el) => { if (el && (el.dataset.pin !== '0' || el.scrollTop + el.clientHeight >= el.scrollHeight - 60)) { el.scrollTop = el.scrollHeight; el.dataset.pin = '1' } } },
           msgs.map((x) => {
             const isHer = x.type === 'utterance'
             const him = isHer ? null : splitHim(x)
@@ -935,6 +938,7 @@ window.__ModuleLoader__.load({
                   : null,
               ))
           }),
+          ),
           h('div', { className: 'empty k', style: { paddingTop: 6 } }, '点她说的任意一句，看那一轮她看到了什么、想了什么。'),
         ),
       )
