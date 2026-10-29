@@ -17,8 +17,8 @@
 
 ```powershell
 $node = 'C:\Users\Administrator\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe'
-& $node tools/audit.mjs      # 35 项，必须 0 警告
-& $node tools/run-tests.mjs  # 25 套测试，必须全绿
+& $node tools/audit.mjs      # 45 项，必须 0 警告
+& $node tools/run-tests.mjs  # 33 套测试，必须全绿
 ```
 
 改完 `lib/` 或 `hands/` 要**重启她**（`boot.ps1 -Force`）；改 `plugin/lib/index.js` 要**重启 DSH**。
@@ -35,7 +35,7 @@ Select-String -Path plugin/lib/client.js -Pattern '<你刚加的类名>'
 
 ## 加一类"事实"之前先看预算
 
-`lib/think.mjs` 的 `factsOf` 已经管 8 类事实，全部经过 `lib/budget.mjs` 按优先级裁到 600 token。
+`lib/think.mjs` 的 `factsOf` 已经管 8 类事实，全部经过 `lib/budget.mjs` 按优先级裁到 1000 token（她定的上限，见 sandbox/预算规则.json）。
 加新的一类要：给 `PRIO` 定优先级 + 更新 `test/budget.mjs`。**别再往提示词里硬塞**。
 
 ## 不要替她做决定

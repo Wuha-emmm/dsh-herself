@@ -217,6 +217,26 @@ for (let i = 0; i < comps.length; i += 2) {
   }
 }
 
+// 改了代码却没有改动单：她担心的正是"事后想起来补"，所以从提交这一头反查
+{
+  const { execFileSync } = await import('node:child_process')
+  let commits = []
+  try {
+    commits = execFileSync('git', ['log', '--since=7.days', '--name-only', '--pretty=format:%H'], { cwd: HER, encoding: 'utf8' })
+      .split('\n')
+      .filter((l) => l && !l.startsWith('lib/') && !l.startsWith('hands/') && !l.startsWith('plugin/') && !l.startsWith('tools/') && l.length > 20)
+  } catch { /* 不是 git 仓库就算了 */ }
+  let entries = 0
+  try {
+    const weekAgo = Date.now() - 7 * 86400000
+    entries = fs.readFileSync(path.join(HER, 'docs', 'CHANGES.md'), 'utf8').split('\n')
+      .filter((l) => /^## \d{4}-/.test(l))
+      .filter((l) => Date.parse(l.slice(3, 13) + 'T00:00:00Z') >= weekAgo).length
+  } catch { /* 没改动单 */ }
+  if (commits.length && !entries) W('七天内改了代码，但改动单是空的——改了代码却没有改动单')
+  else Y(`七天内改动 ${entries} 条，提交 ${commits.length} 个，对得上`)
+}
+
 // 联系 DS 的通道必须带身份校验（不是靠她自己判断）
 {
   const tc = readSrc('lib/toolcall.mjs')
