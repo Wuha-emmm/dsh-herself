@@ -57,11 +57,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OWNER/dsh-herself.git"
+    "url": "git+https://github.com/Wuha-emmm/dsh-herself.git"
   },
-  "homepage": "https://github.com/OWNER/dsh-herself#readme",
+  "homepage": "https://github.com/Wuha-emmm/dsh-herself#readme",
   "bugs": {
-    "url": "https://github.com/OWNER/dsh-herself/issues"
+    "url": "https://github.com/Wuha-emmm/dsh-herself/issues"
   },
   "engines": {
     "node": ">=20"
