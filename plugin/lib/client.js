@@ -144,12 +144,15 @@ window.__ModuleLoader__.load({
         h('div', { className: 'card' },
           h('h3', {}, '自检'),
           h('div', { style: { display: 'flex', gap: 6, flexWrap: 'wrap' } },
-            h('span', { className: 'chip ' + (health === null ? '' : (health.brain?.ok ? 'good' : 'bad')) }, '模型 ' + (health === null ? '…' : (health.brain?.ok ? '通' : '断'))),
+            // brain 其实是插件内部的本地服务（不是模型）；以前标成「模型」是错的
+            h('span', { className: 'chip ' + (health === null ? '' : (health.brain?.ok ? 'good' : 'bad')) }, '内部服务 ' + (health === null ? '…' : (health.brain?.ok ? '通' : '断'))),
             h('span', { className: 'chip ' + (health === null ? '' : (health.qq?.online ? 'good' : 'bad')) }, 'QQ ' + (health === null ? '…' : (health.qq?.online ? '在线' : '离线'))),
-            h('span', { className: 'chip ' + (health === null ? '' : (health.edge?.cdp ? 'good' : 'bad')) }, '浏览器 ' + (health === null ? '…' : (health.edge?.cdp ? '通' : '断'))),
-            h('span', { className: 'chip ' + (health === null ? '' : (health.listener?.alive ? 'good' : 'bad')) }, '监听 ' + (health === null ? '…' : (health.listener?.alive ? '在' : '停'))),
-            h('span', { className: 'chip ' + (health === null ? '' : (health.wake?.alive ? 'good' : 'bad')) }, '主动发言 ' + (health === null ? '…' : (health.wake?.alive ? '在' : '停'))),
+            // 浏览器是可选的：只有要看网页/空间时才需要。没开不该报红，那会让人以为她坏了
+            h('span', { className: 'chip ' + (health === null ? '' : (health.edge?.cdp ? 'good' : '')) }, '浏览器 ' + (health === null ? '…' : (health.edge?.cdp ? '在' : '未开'))),
+            h('span', { className: 'chip ' + (health === null ? '' : (health.listener?.alive ? 'good' : 'bad')) }, '监听 ' + (health === null ? '…' : (health.listener?.alive ? '在' : '断了'))),
+            h('span', { className: 'chip ' + (health === null ? '' : (health.wake?.alive ? 'good' : 'bad')) }, '主动发言 ' + (health === null ? '…' : (health.wake?.alive ? '在' : '停了'))),
           ),
+          h('p', { className: 'sub', style: { marginTop: 8 } }, '浏览器只在要看网页 / QQ 空间时才需要，没开不影响她说话；要开去「登录」页。'),
           health === null
             ? h('p', { className: 'sub', style: { marginTop: 8 } }, '健康接口还没响应——如果一直停在这里，说明插件没重载或 /health 路由没注册。')
             : (health.lastError ? h('p', { className: 'sub', style: { marginTop: 8, color: '#d9534f' } }, '最近错误：' + health.lastError) : null),

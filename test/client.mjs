@@ -275,6 +275,9 @@ ok(/@media \(max-width:760px\)/.test(css), '窄屏会改成上下排（否则右
   // 误报比漏报更糟——改成钉住这一处具体的回归。
   ok(!/\bst\?\.readonly/.test(SRC), '状态页不再引用没声明的 st（之前整页报错）')
   ok(/\bs\?\.readonly/.test(SRC), '只读判断读的是本页的 s')
+  // 自检的措辞别吓人：浏览器是可选的，没开不该报红
+  ok(/浏览器 ' \+ \(health === null \? '…' : \(health\.edge\?\.cdp \? '在' : '未开'\)\)/.test(SRC), '浏览器没开显示「未开」，不是红色「断」')
+  ok(!/模型 ' \+/.test(SRC), '内部服务不再被标成「模型」')
   ok(/brainHolder/.test(SRC), '把占着大脑的 pid 说出来，不是含糊的有人在用')
 }
 console.log(`\n${pass} 通过 / ${fail} 失败`)
