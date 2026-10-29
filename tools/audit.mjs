@@ -139,6 +139,13 @@ for (let i = 0; i < comps.length; i += 2) {
   if (gated) Y('插件的写入口认脑子锁（第二个工作区只读，409 说清是谁占着）')
   else W('插件能绕过脑子锁写事件：两个 DSH 工作区会各写一份')
 }
+// 同义扩展：她说"回两条"，记录里是"发两条"
+{
+  const hasLib = fs.existsSync(path.join(HER, 'lib', 'synonyms.mjs'))
+  const wired = /synonymTokens/.test(readSrc('lib/recall.mjs'))
+  if (hasLib && wired) Y('检索会同义扩展（没见过的词按同义字换一遍再找）')
+  else W('检索只认字面：换个说法就翻不到旧事')
+}
 // 破坏性操作要有二次确认
 {
   const stop = readSrc('stop-her.ps1')
