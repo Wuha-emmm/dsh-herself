@@ -533,6 +533,7 @@ window.__ModuleLoader__.load({
         .dlive .detail{max-height:none;width:100%}
       }
       .dlive .msgs{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:2px}
+      .dlive .sep{text-align:center;font-size:10.5px;color:var(--dsw-alias-label-tertiary);margin:10px 0 8px;letter-spacing:.03em}
       .dlive .msg{display:flex;margin-bottom:10px}
       .dlive .msg.left{justify-content:flex-start}
       .dlive .msg.right{justify-content:flex-end}
@@ -844,6 +845,15 @@ window.__ModuleLoader__.load({
       const cur = rows.find((r) => r.key === view)
       // 顺序跟 QQ 一致：上旧下新（以前 reverse 过，看起来像倒着长）
       const msgs = view === 'list' ? [] : all.filter((x) => keyOf(x) === view)
+      // 时间分隔条：相邻两条隔了 10 分钟以上（或跨天）就插一个时间，像 QQ 一样
+      const rowsWithSep = []
+      msgs.forEach((x, k) => {
+        const prev = msgs[k - 1]
+        const gap = prev ? (Date.parse(x.ts) - Date.parse(prev.ts)) : Infinity
+        const newDay = prev && String(prev.ts).slice(0, 10) !== String(x.ts).slice(0, 10)
+        if (!prev || gap >= 10 * 60000 || newDay) rowsWithSep.push({ sep: true, key: 'sep-' + x.id, at: x.ts, newDay })
+        rowsWithSep.push(x)
+      })
 
       const back = () => { setView('list'); setSel('') }
       const head = (title, right) => h('div', { className: 'page-h' },
@@ -919,7 +929,12 @@ window.__ModuleLoader__.load({
           err ? h('div', { className: 'err' }, err) : null,
           !msgs.length ? h('div', { className: 'empty' }, '这条会话还没有内容。') : null,
           h('div', { className: 'msgs', ref: (el) => { if (el && (el.dataset.pin !== '0' || el.scrollTop + el.clientHeight >= el.scrollHeight - 60)) { el.scrollTop = el.scrollHeight; el.dataset.pin = '1' } } },
-          msgs.map((x) => {
+          rowsWithSep.map((x) => {
+            if (x.sep) {
+              const t = String(x.at).slice(11, 16)
+              const day = String(x.at).slice(5, 10).replace('-', ' 月 ') + ' 日'
+              return h('div', { key: x.key, className: 'sep' }, x.newDay ? (day + ' ' + t) : t)
+            }
             const isHer = x.type === 'utterance'
             const him = isHer ? null : splitHim(x)
             return h('div', { key: x.id, className: 'msg ' + (isHer ? 'right' : 'left') },

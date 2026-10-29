@@ -137,6 +137,8 @@ ok(Boolean(walk(trows[0]).find((c) => cls(c).includes('trow-ava'))), '每行左�
   ok(Boolean(walk(conv).find((c) => cls(c) === 'msgs')), '消息装在可滚动的容器里（才能贴底）')
   const order = msgsC.map((r) => cls(r).includes('right') ? 'her' : 'him')
   ok(order[0] === 'him' && order[1] === 'her', '顺序跟 QQ 一样：上旧下新', JSON.stringify(order))
+  const seps = walk(conv).filter((c) => cls(c) === 'sep')
+  ok(seps.length === 1, '同一段对话只在开头插一个时间条（间隔不到 10 分钟不插）', String(seps.length))
   ok(/思考 120 字/.test(String(walk(rightC).find((c) => cls(c) === 'badge')?.children?.[0] ?? '')), '气泡里带「思考 N 字」')
 }
 
