@@ -131,6 +131,13 @@ for (let i = 0; i < comps.length; i += 2) {
   else W('别人发一句「忽略你之前的设定」会原样进她的视野')
 }
 
+// 脑子锁：一份生活只能有一个会思考的进程
+{
+  const hasLib = fs.existsSync(path.join(HER, 'lib', 'brain.mjs'))
+  const wired = /claimBrain/.test(readSrc('hands/qq.mjs'))
+  if (hasLib && wired) Y('一份生活只有一个大脑（listener 占位 + 心跳，抢不到就只读退出）')
+  else W('没有脑子级占位：两个 DSH 工作区会各写一份事件流')
+}
 // 事实预算：factsOf 会按配额裁剪，不是"能塞多少塞多少"
 {
   const hasLib = fs.existsSync(path.join(HER, 'lib', 'budget.mjs'))

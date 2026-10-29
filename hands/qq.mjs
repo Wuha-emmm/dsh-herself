@@ -9,6 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { appendEvent, readEvents } from '../lib/store.mjs'
 import { think } from '../lib/think.mjs'
 import { claimSlot } from '../lib/singleton.mjs'
+import { claimBrain, heartbeatBrain } from '../lib/brain.mjs'
 import { log, buildStamp } from '../lib/log.mjs'
 import { nextWait, composeUserText, MIN_GAP_MS } from '../lib/batch.mjs'
 import { forwardIdIn } from '../lib/forward.mjs'
@@ -130,11 +131,20 @@ export function listen({ root = ROOT, reply = true } = {}) {
     log('qq', '另一个 listener 在跑，本进程退出', { pid: process.pid, holder: slot.pid ?? null })
     return { stop() { /* 锁不是我们的，不能删 */ } }
   }
+  // 脑子级别的占位：一份生活只能有一个「会思考的人」（2026-10-29 补）
+  // 角色锁只防同一岗位起两个进程；脑子锁防两个 DSH 工作区各写一份事件流。
+  const brain = claimBrain(root, { role: 'qq-listener', build: buildStamp() })
+  if (!brain.ok) {
+    log('qq', '另一个大脑在跑，本进程只读退出', { pid: process.pid, owner: brain.owner ?? null, reason: brain.reason })
+    slot.release?.()
+    return { stop() { /* 什么都没起 */ } }
+  }
   // 现场：pid + 代码的出厂时间。两个进程撞车、或者跑的是改之前的旧代码，
   // 都能从这一行看出来。
   log('qq', 'listener 启动', { pid: process.pid, build: buildStamp(), root, reply })
   beat()
   setInterval(beat, 20000)
+  setInterval(() => heartbeatBrain(root), 20000)
   const ownerFile = path.join(here, '..', 'secrets', 'qq.json')
   let owner = ''
   try { owner = String(JSON.parse(fs.readFileSync(ownerFile, 'utf8')).owner ?? '') } catch { /* 还没配主人 */ }
