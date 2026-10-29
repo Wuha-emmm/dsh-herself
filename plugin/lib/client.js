@@ -88,6 +88,17 @@ window.__ModuleLoader__.load({
       useEffect(() => { load() }, [load])
 
       const [health, setHealth] = useState(null)
+      const [ownerQq, setOwnerQq] = useState('')
+      const [ownerMsg, setOwnerMsg] = useState('')
+      useEffect(() => { get('/owner').then((r) => setOwnerQq(String(r.owner ?? ''))).catch(() => {}) }, [])
+      const saveOwner = useCallback(async (qq) => {
+        setOwnerMsg('正在核…')
+        try {
+          const r = await get('/owner', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ qq }) })
+          setOwnerQq(r.owner)
+          setOwnerMsg(`已设为 ${r.owner}${r.nickname ? '（' + r.nickname + '）' : ''}；她下一轮生效`)
+        } catch (e) { setOwnerMsg('没存上：' + e.message) }
+      }, [])
       useEffect(() => {
         const pull = () => get('/health').then(setHealth).catch(() => {})
         pull()
@@ -160,6 +171,16 @@ window.__ModuleLoader__.load({
 
         h('div', { className: 'card' },
         h('div', { className: 'card' },
+        h('div', { className: 'card' },
+          h('h3', {}, '主人是谁（只认这个号）'),
+          h('p', { className: 'sub' }, '写死在 secrets/qq.json，不走文本识别。存之前拿 OneBot API 核一次昵称，查不到不让存。'),
+          h('div', { className: 'row' },
+            h('span', { style: { flex: 1 } }, '现在是：' + (ownerQq || '（还没配）')),
+            h('button', { className: 'go', onClick: () => { const v = window.prompt('主人 QQ 号（5-12 位数字）', ownerQq || ''); if (v) saveOwner(v) } }, ownerQq ? '改' : '设置'),
+          ),
+          ownerMsg ? h('p', { className: 'sub', style: { marginTop: 8 } }, ownerMsg) : null,
+        ),
+
           h('h3', {}, '谁能让我联系 DS'),
           h('p', { className: 'sub' }, '这条通道不是对所有人开的。下面三条写死在代码里，不靠我临场判断：'),
           h('div', { className: 'row' }, h('span', { className: 'chip on' }, '只有主人'), h('span', { style: { flex: 1 } }, '群里的人 @ 我、陌生人私聊我，都投不出去')),

@@ -311,6 +311,23 @@ export function apply(ctx, baseConfig = {}) {
         if (!t) return sendJson(res, 404, { ok: false, error: '这一轮没有记录（面板上线之前的回合补不回来）' })
         return sendJson(res, 200, { ok: true, turn: t })
       }
+      if (p === '/dsh-herself/api/owner') {
+        // 主人是谁：只读 / 设置（设置前会用 OneBot 的 HTTP API 核一次，不靠文本识别）
+        if (req.method === 'POST') {
+          const raw = await readBody(req)
+          let qq = ''
+          try { qq = String(JSON.parse(raw || '{}').qq ?? '').trim() } catch { /* ignore */ }
+          const { verifyQq, writeOwner } = await import('../../lib/owner.mjs')
+          const v = await verifyQq(qq, { herRoot: HER_ROOT })
+          if (!v.ok) return sendJson(res, 400, { ok: false, error: v.error })
+          const saved = writeOwner(HER_ROOT, qq)
+          log('plugin', '主人号已设置', { qq: saved, nickname: v.nickname })
+          return sendJson(res, 200, { ok: true, owner: saved, nickname: v.nickname })
+        }
+        const { readOwner } = await import('../../lib/owner.mjs')
+        return sendJson(res, 200, { ok: true, owner: readOwner(HER_ROOT) })
+      }
+
       if (p === '/dsh-herself/api/state') {
         const events = fs.existsSync(root) ? readEvents(root) : []
         const self = derive(events, Date.now())
