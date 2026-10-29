@@ -16,6 +16,9 @@ const ok = []
 
 const P = (m) => problems.push(m)
 const W = (m) => warnings.push(m)
+// N = 只报不拦：她要求这类'清单'不要变成挡住别项的警告
+const note = []
+const N = (m) => { note.push(m); console.log('  · ' + m) }
 const Y = (m) => ok.push(m)
 
 // ---------------------------------------------------------------- 1. 事件流
@@ -235,6 +238,18 @@ for (let i = 0; i < comps.length; i += 2) {
   } catch { /* 没改动单 */ }
   if (commits.length && !entries) W('七天内改了代码，但改动单是空的——改了代码却没有改动单')
   else Y(`七天内改动 ${entries} 条，提交 ${commits.length} 个，对得上`)
+}
+
+// 没挂上改动单的提交：只报不拦（她定的：噪音大先跑一周再说）
+{
+  let r = { ok: false }
+  try { r = (await import('../tools/link-check.mjs')).unlinkedCommits(7) } catch { /* 跳过 */ }
+  if (!r.ok) N('查不了提交（不是 git 仓库）')
+  else {
+    const miss = r.commits.filter((x) => !x.linked)
+    if (!miss.length) Y(`七天内 ${r.commits.length} 个代码提交，都挂上了改动单`)
+    else N(`${miss.length} 个代码提交没挂上改动单：${miss.slice(0, 3).map((x) => x.hash).join(' ')}（清单见 sandbox/DSH-回话.md）`)
+  }
 }
 
 // 联系 DS 的通道必须带身份校验（不是靠她自己判断）
@@ -460,7 +475,7 @@ console.log('\n=== 通过 ===')
 for (const m of ok) console.log('  ✓ ' + m)
 if (warnings.length) { console.log('\n=== 警告 ==='); for (const m of warnings) console.log('  ! ' + m) }
 if (problems.length) { console.log('\n=== 问题 ==='); for (const m of problems) console.log('  ✗ ' + m) }
-console.log(`\n结果：${ok.length} 通过 / ${warnings.length} 警告 / ${problems.length} 问题`)
+console.log(`\n结果：${ok.length} 通过 / ${warnings.length} 警告 / ${problems.length} 问题 / ${note.length} 待看`)
 // 她的第一条建议：检查脚本自己也得有人读。
 // 落成文件，下一轮对话开始时会贴到她眼前（think.mjs 读这个）。
 try {

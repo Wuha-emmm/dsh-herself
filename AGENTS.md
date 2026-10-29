@@ -17,8 +17,8 @@
 
 ```powershell
 $node = 'C:\Users\Administrator\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe'
-& $node tools/audit.mjs      # 45 项，必须 0 警告
-& $node tools/run-tests.mjs  # 33 套测试，必须全绿
+& $node tools/audit.mjs      # 必须 0 警告（项数以输出为准，别在文档里写死数字）
+& $node tools/run-tests.mjs  # 必须全绿（套数以输出为准）
 ```
 
 改完 `lib/` 或 `hands/` 要**重启她**（`boot.ps1 -Force`）；改 `plugin/lib/index.js` 要**重启 DSH**。

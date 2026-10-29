@@ -58,6 +58,9 @@ if (!title || !what || !why) {
 }
 
 const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ')
+// 记下当前 HEAD：link-check 靠它把提交和改动单对上
+let gitHead = ''
+try { gitHead = (await import('node:child_process')).execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: HER, encoding: 'utf8' }).trim() } catch { /* 不是仓库 */ }
 const entry = [
   '',
   `## ${stamp} ${title}`,
@@ -69,6 +72,7 @@ const entry = [
   `| 谁提的 | ${get('who') || '我（DS）'} |`,
   `| 怎么退 | ${revert || '见提交记录'} |`,
   ...(impact ? [`| 影响 | ${impact} |`] : []),
+  ...(gitHead ? [`| 提交 | ${gitHead} |`] : []),
   '',
 ].join('\n')
 
