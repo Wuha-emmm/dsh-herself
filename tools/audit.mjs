@@ -187,9 +187,15 @@ for (let i = 0; i < comps.length; i += 2) {
   const hasLib = fs.existsSync(path.join(HER, 'lib', 'qzone.mjs'))
   const wired = /name: 'read_qzone'/.test(readSrc('lib/toolcall.mjs'))
   const qz = hasLib ? fs.readFileSync(path.join(HER, 'lib', 'qzone.mjs'), 'utf8') : ''
-  const readOnly = /export async function feedList/.test(qz) && !/export async function (publish|like|comment)/i.test(qz)
-  if (hasLib && wired && readOnly) Y('空间的只读入口通了（read_qzone，只能看不能动）')
-  else W(`空间入口不完整：${hasLib ? '' : '缺 lib/qzone '}${wired ? '' : '缺工具 '}${readOnly ? '' : '含写操作但没审批'}`)
+  const qz = hasLib ? fs.readFileSync(path.join(HER, 'lib', 'qzone.mjs'), 'utf8') : ''
+  const tcSrc = readSrc('lib/toolcall.mjs')
+  const wants = ['qzone_feeds', 'qzone_detail', 'qzone_post', 'qzone_comment', 'qzone_like']
+  const defined = wants.filter((n) => new RegExp("name: '" + n + "'").test(tcSrc))
+  const implemented = ['feedList', 'feeds', 'detail', 'post', 'comment', 'like'].filter((n) => new RegExp('export async function ' + n).test(qz))
+  // 主人定过：不设审批门。体检只管"接得上"——工具定义与实现都不缺。
+  const reached = defined.length === wants.length && implemented.length >= 5
+
+  else W(`空间入口不完整：工具 ${defined.length}/5，实现 ${implemented.length} 个`)
 }
 // 联系 DS 的通道必须带身份校验（不是靠她自己判断）
 {
