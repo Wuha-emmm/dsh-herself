@@ -179,7 +179,7 @@ for (let i = 0; i < comps.length; i += 2) {
   const tc = readSrc('lib/toolcall.mjs')
   const m = tc.match(/max_tokens:\s*(\d+)/)
   const cap = m ? Number(m[1]) : 0
-  if (cap >= 1200) Y(`推理+输出共用预算 ${cap}（600 时她想过 564 字，话说一半就断了）`)
+  if (cap >= 4000) Y(`推理+输出共用预算 ${cap}（给到模型上限；600 时她想过 564 字，话说一半就断了）`)
   else W(`max_tokens=${cap} 太小：reasoning 会把它吃光，回复被截断`)
 }
 // 孤儿写入口：存了却没人读（她的原则：读它的人还有她自己）
