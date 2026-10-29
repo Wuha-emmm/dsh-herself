@@ -177,10 +177,10 @@ window.__ModuleLoader__.load({
             )),
         ),
 
-        st?.readonly
+        s?.readonly
           ? h('div', { className: 'card ro' },
             h('h3', {}, '这个面板只能看'),
-            h('p', { className: 'muted' }, `她在另一个 DSH 工作区里跑（pid ${st?.brainHolder ?? '?'}）。`),
+            h('p', { className: 'muted' }, `她在另一个 DSH 工作区里跑（pid ${s?.brainHolder ?? '?'}）。`),
             h('p', { className: 'muted' }, '这里不写事件、也不起停进程——去那个工作区操作，或者先把那边的她停掉。'),
           )
           : h('div', { className: 'card' },

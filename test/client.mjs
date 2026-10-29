@@ -260,7 +260,7 @@ ok(/@media \(max-width:760px\)/.test(css), '窄屏会改成上下排（否则右
 // 只读工作区：第二个 DSH 里不能装作能操作（2026-10-29 主人要求）
 {
   // 面板是运行时渲染的，这里从句柄层钉住：只读分支必须在，并且要说清是谁占着
-  ok(/st\?\.readonly/.test(SRC), '面板读 state.readonly')
+  ok(/\bs\?\.readonly/.test(SRC), '面板读 state.readonly')
   ok(SRC.includes('这个面板只能看'), '只读时显示「这个面板只能看」')
   // 页签不能有死链：每个 tab 都要有页面，页面组件不能是未定义的
   const tabsBlock = (SRC.match(/const TABS = \[([\s\S]*?)\n    \]/) || [])[1] || ''
@@ -269,6 +269,12 @@ ok(/@media \(max-width:760px\)/.test(css), '窄屏会改成上下排（否则右
   const used = [...new Set([...SRC.matchAll(/h\((\w+Page)\)/g)].map((m) => m[1]))]
   ok(used.every((n) => SRC.indexOf('function ' + n + '(') >= 0), '用到的页面组件都定义了（不会点开空白）', JSON.stringify(used))
   ok(/她现在相信什么/.test(SRC) && /当初是因为/.test(SRC), '判断清单带时间与证据')
+
+  // 渲染期 ReferenceError 的教训：桩 h 不会执行组件，所以 'st is not defined' 测试抓不到。
+  // 试过写通用的静态检查，但 health.listener?.alive 这种链式属性会被误判成未声明变量，
+  // 误报比漏报更糟——改成钉住这一处具体的回归。
+  ok(!/\bst\?\.readonly/.test(SRC), '状态页不再引用没声明的 st（之前整页报错）')
+  ok(/\bs\?\.readonly/.test(SRC), '只读判断读的是本页的 s')
   ok(/brainHolder/.test(SRC), '把占着大脑的 pid 说出来，不是含糊的有人在用')
 }
 console.log(`\n${pass} 通过 / ${fail} 失败`)
