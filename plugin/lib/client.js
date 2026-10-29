@@ -1014,9 +1014,6 @@ window.__ModuleLoader__.load({
                   h('span', {}, isHer ? '她' : him.name),
                   h('span', { className: 't' }, hhmm(x.ts)),
                 ),
-                (x.segs && x.segs.length) ? h('div', { className: 'segs' }, x.segs.map((g, gi) => h('span', { key: gi, className: 'seg' },
-                  g.t === 'reply' ? '↩ 引用' : g.t === 'forward' ? '转发' : g.t === 'image' ? '图' : g.t === 'face' ? '表情' : g.t === 'record' ? ('语音 ' + (g.dur ? Math.round(g.dur) + 's' : '')) : g.t === 'at' ? '@' : g.t
-                ))) : null,
                 h('div', { className: 'txt' }, isHer ? x.text : him.body),
                 isHer && x.trace
                   ? h('div', { className: 'badge' }, `思考 ${x.trace.reasoning} 字${x.trace.tools ? ` · ${x.trace.tools} 手` : ''}`)

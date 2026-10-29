@@ -42,6 +42,7 @@ function textOf(message) {
       const sec = Number(seg.data?.duration ?? 0)
       return sec ? '[语音 ' + Math.round(sec) + 's]' : '[语音]'
     }
+    if (seg.type === 'reply') return '[引用]'      // 引用：以前直接丢了，消息看起来什么都没有
     if (seg.type === 'forward') return '[转发]'   // 让她至少知道有一段记录可以展开
     if (seg.type === 'at') return `@${seg.data?.qq ?? ''}`
     return ''
