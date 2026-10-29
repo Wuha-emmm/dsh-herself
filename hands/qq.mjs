@@ -105,6 +105,19 @@ export function recordMessage(ev, { root = ROOT } = {}) {
   const text = textOf(ev.message)
   // 语音段原样留下：file / url / duration 都在里面
   const voiceSeg = (Array.isArray(ev.message) ? ev.message.find((s) => s.type === 'record')?.data : null) ?? null
+  // 结构化的消息段：面板要显示「引用/转发/图/表情」，光靠 flatten 的正文看不出来
+  const segs = (Array.isArray(ev.message) ? ev.message : [])
+    .filter((s) => s && s.type && s.type !== 'text')
+    .slice(0, 8)
+    .map((s) => {
+      if (s.type === 'reply') return { t: 'reply', id: String(s.data?.id ?? s.data?.message_id ?? '') }
+      if (s.type === 'forward') return { t: 'forward', id: String(s.data?.id ?? '') }
+      if (s.type === 'image') return { t: 'image' }
+      if (s.type === 'face') return { t: 'face', id: String(s.data?.id ?? '') }
+      if (s.type === 'record') return { t: 'record', dur: Number(s.data?.duration ?? 0) }
+      if (s.type === 'at') return { t: 'at', qq: String(s.data?.qq ?? '') }
+      return { t: String(s.type).slice(0, 12) }
+    })
   if (!text) return null
   if (isSystemNotice(text, ev)) return null
 
@@ -125,7 +138,7 @@ export function recordMessage(ev, { root = ROOT } = {}) {
     text: groupId ? `[群 ${groupId}] ${sender}：${text}` : `${sender}：${text}`,
     acl: { visibility: 'private', surfaces: ['qq', 'dsh'] },
     meta: {
-      qq: { selfId, senderId, groupId, messageId: ev.message_id, private: isPrivate, atMe: Boolean(ev.atme), ...(voiceSeg ? { voice: voiceSeg } : {}) },
+      qq: { selfId, senderId, groupId, messageId: ev.message_id, private: isPrivate, atMe: Boolean(ev.atme), ...(voiceSeg ? { voice: voiceSeg } : {}), ...(segs.length ? { segs } : {}) },
     },
   })
   return event

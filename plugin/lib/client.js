@@ -580,6 +580,9 @@ window.__ModuleLoader__.load({
       .dlive .msg.right{justify-content:flex-end}
       /* 气泡底色写死，不用主题变量：--dsw-alias-brand-primary 在某些主题下是白色，
          结果就是白底白字（2026-10-29 截图里就是这么翻的）。 */
+      /* 引用/转发/图/表情/语音：QQ 那边是块，这边先用小标签标出来（2026-10-30） */
+      .dlive .segs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:2px}
+      .dlive .segs .seg{font-size:10px;padding:0 5px;border-radius:8px;border:.5px solid var(--dsw-alias-border-l2);opacity:.75}
       .dlive .bub{max-width:88%;border-radius:14px;padding:7px 11px 8px;line-height:19px;word-break:break-word}
       .dlive .bub.him{background:rgba(127,127,127,.18);color:inherit;border-bottom-left-radius:5px}
       .dlive .bub.her{background:#4d6bfe;color:#fff;border-bottom-right-radius:5px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.22)}
@@ -1011,6 +1014,9 @@ window.__ModuleLoader__.load({
                   h('span', {}, isHer ? '她' : him.name),
                   h('span', { className: 't' }, hhmm(x.ts)),
                 ),
+                (x.segs && x.segs.length) ? h('div', { className: 'segs' }, x.segs.map((g, gi) => h('span', { key: gi, className: 'seg' },
+                  g.t === 'reply' ? '↩ 引用' : g.t === 'forward' ? '转发' : g.t === 'image' ? '图' : g.t === 'face' ? '表情' : g.t === 'record' ? ('语音 ' + (g.dur ? Math.round(g.dur) + 's' : '')) : g.t === 'at' ? '@' : g.t
+                ))) : null,
                 h('div', { className: 'txt' }, isHer ? x.text : him.body),
                 isHer && x.trace
                   ? h('div', { className: 'badge' }, `思考 ${x.trace.reasoning} 字${x.trace.tools ? ` · ${x.trace.tools} 手` : ''}`)
