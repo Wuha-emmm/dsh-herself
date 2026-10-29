@@ -15,9 +15,10 @@ jobs:
         with:
           node-version: '20'
 
-      # 她的生活目录不在仓库里，所以涉及真实数据的用例会自己跳过
-      - name: 体检
-        run: node tools/audit.mjs
-
-      - name: 测试
+      # 测试都是纯函数级的，不需要她的生活目录 / 钥匙 / 网络
+      - name: 测试（25 套）
         run: node tools/run-tests.mjs
+
+      # 体检依赖她的真实数据（life/ secrets/），在 CI 里会大量告警，所以只跑一次"能不能加载"
+      - name: 冒烟（模块能加载）
+        run: node -e "import('./lib/derive.mjs').then(m=>console.log('derive ok', typeof m.derive))"
