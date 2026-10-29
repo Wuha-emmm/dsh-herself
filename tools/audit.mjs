@@ -182,6 +182,14 @@ for (let i = 0; i < comps.length; i += 2) {
   if (cap >= 4000) Y(`推理+输出共用预算 ${cap}（给到模型上限；600 时她想过 564 字，话说一半就断了）`)
   else W(`max_tokens=${cap} 太小：reasoning 会把它吃光，回复被截断`)
 }
+// 空间的只读入口（她说过：得先有个能读空间内容的入口）
+{
+  const hasLib = fs.existsSync(path.join(HER, 'lib', 'qzone.mjs'))
+  const wired = /name: 'read_qzone'/.test(readSrc('lib/toolcall.mjs'))
+  const readOnly = /export async function feedList/.test(hasLib ? fs.readFileSync(path.join(HER, 'lib', 'qzone.mjs'), 'utf8') : '') && !/publish|like|comment/i.test(hasLib ? fs.readFileSync(path.join(HER, 'lib', 'qzone.mjs'), 'utf8') : '')
+  if (hasLib && wired && readOnly) Y('空间的只读入口通了（read_qzone，只能看不能动）')
+  else W(`空间入口不完整：${hasLib ? '' : '缺 lib/qzone '}${wired ? '' : '缺工具 '}${readOnly ? '' : '含写操作但没审批'}`)
+}
 // 联系 DS 的通道必须带身份校验（不是靠她自己判断）
 {
   const tc = readSrc('lib/toolcall.mjs')
