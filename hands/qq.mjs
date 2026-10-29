@@ -37,7 +37,11 @@ function textOf(message) {
     if (seg.type === 'text') return seg.data?.text ?? ''
     if (seg.type === 'image') return '[图片]'
     if (seg.type === 'face') return '[表情]'
-    if (seg.type === 'record') return '[语音]'
+    if (seg.type === 'record') {
+      // 语音段：带上时长；file id 由 recordMessage 单独存进 meta（不塞进正文）
+      const sec = Number(seg.data?.duration ?? 0)
+      return sec ? '[语音 ' + Math.round(sec) + 's]' : '[语音]'
+    }
     if (seg.type === 'forward') return '[转发]'   // 让她至少知道有一段记录可以展开
     if (seg.type === 'at') return `@${seg.data?.qq ?? ''}`
     return ''
@@ -99,6 +103,8 @@ export function recordMessage(ev, { root = ROOT } = {}) {
   const senderId = String(ev.sender?.user_id ?? ev.user_id ?? '')
   const isSelf = senderId === selfId
   const text = textOf(ev.message)
+  // 语音段原样留下：file / url / duration 都在里面
+  const voiceSeg = (Array.isArray(ev.message) ? ev.message.find((s) => s.type === 'record')?.data : null) ?? null
   if (!text) return null
   if (isSystemNotice(text, ev)) return null
 
@@ -119,7 +125,7 @@ export function recordMessage(ev, { root = ROOT } = {}) {
     text: groupId ? `[群 ${groupId}] ${sender}：${text}` : `${sender}：${text}`,
     acl: { visibility: 'private', surfaces: ['qq', 'dsh'] },
     meta: {
-      qq: { selfId, senderId, groupId, messageId: ev.message_id, private: isPrivate, atMe: Boolean(ev.atme) },
+      qq: { selfId, senderId, groupId, messageId: ev.message_id, private: isPrivate, atMe: Boolean(ev.atme), ...(voiceSeg ? { voice: voiceSeg } : {}) },
     },
   })
   return event
@@ -185,6 +191,8 @@ export function listen({ root = ROOT, reply = true, chat = think, socket = null 
     if (!senderId || senderId === selfId) return
 
     const text = textOf(ev.message)
+  // 语音段原样留下：file / url / duration 都在里面
+  const voiceSeg = (Array.isArray(ev.message) ? ev.message.find((s) => s.type === 'record')?.data : null) ?? null
     if (!text || text.startsWith('/')) return
 
     const isGroup = ev.message_type === 'group'
