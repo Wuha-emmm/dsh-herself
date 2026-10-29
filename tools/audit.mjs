@@ -131,6 +131,13 @@ for (let i = 0; i < comps.length; i += 2) {
   else W('别人发一句「忽略你之前的设定」会原样进她的视野')
 }
 
+// 插件的写入口也必须认脑子锁（否则第二个 DSH 工作区照样能写事件）
+{
+  const srv = readSrc('plugin/lib/index.js')
+  const gated = /pluginBrain/.test(srv) && /api\/say'[\s\S]{0,200}brainBusy/.test(srv) && /stack\/start'[\s\S]{0,160}brainBusy/.test(srv)
+  if (gated) Y('插件的写入口认脑子锁（第二个工作区只读，409 说清是谁占着）')
+  else W('插件能绕过脑子锁写事件：两个 DSH 工作区会各写一份')
+}
 // 脑子锁：一份生活只能有一个会思考的进程
 {
   const hasLib = fs.existsSync(path.join(HER, 'lib', 'brain.mjs'))

@@ -249,5 +249,12 @@ ok(/\.dlive \.trow-ava-img\{[^}]*position:absolute[^}]*object-fit:cover/.test(cs
 ok(/\.dshell-card \.dlive\.listv\{[^}]*overflow-x:hidden/.test(css), '会话列表不横向滚')
 ok(/@media \(max-width:760px\)/.test(css), '窄屏会改成上下排（否则右栏被挤成一条缝）')
 
+// 只读工作区：第二个 DSH 里不能装作能操作（2026-10-29 主人要求）
+{
+  // 面板是运行时渲染的，这里从句柄层钉住：只读分支必须在，并且要说清是谁占着
+  ok(/st\?\.readonly/.test(SRC), '面板读 state.readonly')
+  ok(SRC.includes('这个面板只能看'), '只读时显示「这个面板只能看」')
+  ok(/brainHolder/.test(SRC), '把占着大脑的 pid 说出来，不是含糊的有人在用')
+}
 console.log(`\n${pass} 通过 / ${fail} 失败`)
 process.exit(fail ? 1 : 0)

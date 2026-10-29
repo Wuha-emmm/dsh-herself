@@ -177,13 +177,19 @@ window.__ModuleLoader__.load({
             )),
         ),
 
-        h('div', { className: 'card' },
-          h('h3', {}, '手动记一句（接嘴之前先用）'),
-          h('div', { style: { display: 'flex', gap: 8 } },
-            h('input', { value: text, placeholder: '她会记住这句话…', onChange: (e) => setText(e.target.value), onKeyDown: (e) => { if (e.key === 'Enter') say() } }),
-            h('button', { className: 'go', onClick: say }, '记下'),
+        st?.readonly
+          ? h('div', { className: 'card ro' },
+            h('h3', {}, '这个面板只能看'),
+            h('p', { className: 'muted' }, `她在另一个 DSH 工作区里跑（pid ${st?.brainHolder ?? '?'}）。`),
+            h('p', { className: 'muted' }, '这里不写事件、也不起停进程——去那个工作区操作，或者先把那边的她停掉。'),
+          )
+          : h('div', { className: 'card' },
+            h('h3', {}, '手动记一句（接嘴之前先用）'),
+            h('div', { style: { display: 'flex', gap: 8 } },
+              h('input', { value: text, placeholder: '她会记住这句话…', onChange: (e) => setText(e.target.value), onKeyDown: (e) => { if (e.key === 'Enter') say() } }),
+              h('button', { className: 'go', onClick: say }, '记下'),
+            ),
           ),
-        ),
       )
     }
 

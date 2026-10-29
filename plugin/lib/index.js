@@ -19,10 +19,14 @@ import { derive, renderForSurface } from '../../lib/derive.mjs'
 import { openLogin, listTabs } from '../../hands/login.mjs'
 import { checkSessions } from '../../hands/session.mjs'
 import { targetOf, sniffImage } from '../../lib/avatar.mjs'
+import { claimSlot } from '../../lib/singleton.mjs'
 import { effectivePrefs } from '../../lib/prefs.mjs'
 import { buildLive, readTurn } from '../../lib/live.mjs'
 import { log, buildStamp, logFile } from '../../lib/log.mjs'
 
+// 2026-10-29：两个 DSH 工作区各跑一份插件时，两份都能写事件（/api/say、起停进程）。
+// 所以插件也来抢一次脑子：抢不到就**只读**——面板能看，点「让她说」会被告知大脑在别处。
+const pluginBrain = claimSlot('plugin-brain')
 export const name = 'dsh-herself'
 
 // ⚠️ 必须是一个数组（dsh-fish 踩过：写成对象会静默丢服务）
@@ -356,13 +360,23 @@ export function apply(ctx, baseConfig = {}) {
         })
       }
 
+      // 只读工作区：不写事件、不起停进程（大脑在另一个进程里）
+      const brainBusy = () => !pluginBrain.ok
+      const refused = (res) => sendJson(res, 409, {
+        ok: false,
+        error: '大脑在另一个进程里',
+        holder: pluginBrain.pid ?? null,
+        hint: '这个面板只能看。要操作请去启动她的那个 DSH 工作区，或先停掉那边的进程。',
+      })
       if (p === '/dsh-herself/api/stack/start' && req.method === 'POST') {
+        if (brainBusy()) return refused(res)
         // 她跟着 DSH 活：直接起，进程在 DSH 树下，DSH 关她关
         const r = await runPs('boot.ps1', ['-Force'])
         return sendJson(res, 200, { ok: r.code === 0, out: r.out || '已启动' })
       }
 
       if (p === '/dsh-herself/api/stack/stop' && req.method === 'POST') {
+        if (brainBusy()) return refused(res)
         const r = await runPs('stop-her.ps1')
         return sendJson(res, 200, { ok: r.code === 0, ...r })
       }
@@ -469,6 +483,7 @@ export function apply(ctx, baseConfig = {}) {
       }
 
       if (p === '/dsh-herself/api/say' && req.method === 'POST') {
+        if (brainBusy()) return refused(res)
         const raw = await readBody(req)
         let text = ''
         try { text = String(JSON.parse(raw || '{}').text ?? '').trim() } catch { /* ignore */ }
