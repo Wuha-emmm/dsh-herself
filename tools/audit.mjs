@@ -229,7 +229,7 @@ for (let i = 0; i < comps.length; i += 2) {
 {
   const think = readSrc('lib/think.mjs')
   const tc = readSrc('lib/toolcall.mjs')
-  const noNudge = !/ledger|账本/.test(think)
+  const noNudge = !/该记一笔|记得记|别忘|待办/.test(think)
   const hasTool = /name: 'ledger'/.test(tc)
   if (noNudge && hasTool) Y('账本只在被调用时出现（提示词里不提，不催她记）')
   else W(`账本可能在催：${noNudge ? '' : '提示词里出现了账本'}${hasTool ? '' : '缺工具'}`)
