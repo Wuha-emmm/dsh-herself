@@ -1,4 +1,4 @@
-// hands/qq.mjs —— 她的一只手：OneBot v11（SnowLuma；NapCat 代码留着可回滚）
+// hands/qq.mjs —— 她的一只手：OneBot v11 客户端（默认连 SnowLuma；NapCat 只作回滚）
 // 用法：
 //   node hands/qq.mjs listen            # 收消息 → 写进事件流
 //   node hands/qq.mjs send private 123 "…"
@@ -340,13 +340,13 @@ export function listen({ root = ROOT, reply = true } = {}) {
       }
   }
 
-  // 断线自动重连：NapCat 重启、被踢下线、网络抖动都不用人管
+  // 断线自动重连：OneBot 运行时重启、被踢下线、网络抖动都不用人管
   const connect = () => {
     if (stopped) return
     ws = open()
     ws.addEventListener('open', () => {
       retry = 0
-      console.log('[qq] 已连上 NapCat')
+      console.log('[qq] 已连上 OneBot')
       // 断线期间错过的话：补进事件流（不触发回复）。失败不影响收消息。
       backfill({ root }).then((r) => {
         if (r.added) console.log(`[qq] 补录 ${r.added} 条断线期间的消息`)

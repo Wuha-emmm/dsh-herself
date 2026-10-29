@@ -1,6 +1,6 @@
-// hands/qzone.mjs —— 她的 QQ 空间：读写都走空间接口（cookie 由 NapCat 提供）
+// hands/qzone.mjs —— 她的 QQ 空间：读写都走空间接口（cookie 由 OneBot 运行时提供）
 //
-// 为什么不用浏览器：空间有完整 CGI，NapCat 又能给出 cookie + bkn(g_tk)。
+// 为什么不用浏览器：空间有完整 CGI，OneBot 运行时又能给出 cookie + bkn(g_tk)。
 // 代价：内部接口无文档，风控/改版会坏，所以每个动作都要能单独失败、单独报告。
 import fs from 'node:fs'
 import path from 'node:path'

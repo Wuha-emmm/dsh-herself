@@ -30,7 +30,7 @@ export const inject = ['webServer']
 
 const DEFAULT_ROOT = 'E:\\DSH-herself\\life'
 
-// 整套东西的根（NapCat / 常驻进程 / 日志都在这里）
+// 整套东西的根（OneBot 运行时 / 常驻进程 / 日志都在这里）
 const HER_ROOT = 'E:\\DSH-herself'
 const PID_FILE = path.join(HER_ROOT, 'logs', 'pids.json')
 const NAPCAT_SHELL = path.join(HER_ROOT, 'NapCat.Shell.Windows.OneKey', 'NapCat.52230.Shell')

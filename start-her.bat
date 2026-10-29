@@ -1,7 +1,4 @@
 @echo off
 chcp 65001 >nul
-cd /d "E:\DSH-herself\NapCat.Shell.Windows.OneKey\NapCat.52230.Shell"
-if not exist "E:\DSH-herself\logs" mkdir "E:\DSH-herself\logs"
-echo ==== quick start %date% %time% ==== >> "E:\DSH-herself\logs\napcat.log"
-call NapCatWinBootMain.exe %1 >> "E:\DSH-herself\logs\napcat.log" 2>&1
-echo ==== quick exit %date% %time% ==== >> "E:\DSH-herself\logs\napcat.log"
+rem 快速启动：交给 boot.ps1（默认 SnowLuma 运行时；回滚 NapCat 用 DSH_QQ_RUNTIME=napcat）
+powershell -ExecutionPolicy Bypass -File "%~dp0boot.ps1" %*

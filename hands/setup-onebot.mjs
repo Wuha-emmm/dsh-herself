@@ -1,4 +1,4 @@
-// hands/setup-onebot.mjs —— 给 NapCat 的 OneBot11 配置加一个本地 WS 服务端
+// hands/setup-onebot.mjs —— 给 OneBot11 运行时加一个本地 WS 服务端（SnowLuma / NapCat 通用）
 // 用法：node hands/setup-onebot.mjs <onebot11_xxx.json> <token 文件路径>
 import fs from 'node:fs'
 import path from 'node:path'

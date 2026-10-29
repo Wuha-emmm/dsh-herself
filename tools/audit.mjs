@@ -286,7 +286,7 @@ try {
   if (!/effectivePrefs/.test(wakeSrc)) P('wake.mjs 还在用写死的节奏，没读她的偏好')
   else Y('主动发言读的是她的偏好（prefs），不是硬编码')
 } catch { P('读不到 wake.mjs') }
-if (!/reconnect|setTimeout\(\s*connect/.test(qq)) W('qq.mjs 没有断线重连（NapCat 重启后不会自己接回来）')
+if (!/reconnect|setTimeout\(\s*connect/.test(qq)) W('qq.mjs 没有断线重连（OneBot 运行时重启后不会自己接回来）')
 if (!/inferClaim/.test(qq) && !/inferClaim/.test(think)) W('没有任何地方做 inferred 解读')
 
 // ---------------------------------------------------------------- 4. 运行时

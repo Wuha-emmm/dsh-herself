@@ -1,5 +1,5 @@
-﻿# stop-her.ps1 - stop her node processes and the NapCat/QQ instance.
-# Never touches the user's own QQ install (only QQ.exe launched from the NapCat folder).
+﻿# stop-her.ps1 - 停掉她的 node 进程和 OneBot 运行时（SnowLuma 默认；NapCat 仅回滚时存在）。
+# 不碰用户自己的 QQ：只关从 DSH-herself\SnowLuma 或 NapCat 目录起来的那些进程。
 $ErrorActionPreference = 'SilentlyContinue'
 $root = 'E:\DSH-herself'
 $pidFile = Join-Path $root 'logs\pids.json'

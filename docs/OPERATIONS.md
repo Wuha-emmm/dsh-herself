@@ -108,6 +108,7 @@ Get-Content E:\DSH-herself\logs\trace.jsonl -Tail 1
 ## 环境
 
 - Windows + PowerShell 5.1（插件调 `powershell.exe -File`，**脚本必须是 UTF-8 BOM**）
-- Node 18+（本机用 DSH 内置的 node；`package.json` 无依赖）
-- QQ NT + NapCat（OneBot v11，`ws://127.0.0.1:3001`）
+- Node 20+（本机用 DSH 内置的 node v24；`package.json` 无依赖）
+- **OneBot 运行时：SnowLuma（默认）** + QQ NT；WebSocket `ws://127.0.0.1:3001`（HTTP 3000 / WebUI 5099），令牌在 `secrets/onebot.token`
+  （NapCat 已放弃，只保留回滚：`$env:DSH_QQ_RUNTIME='napcat'` 再跑 `boot.ps1`）
 - DSH（DeepSeek Harness）宿主 + 本插件
