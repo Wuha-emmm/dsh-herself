@@ -9,6 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { appendEvent, readEvents } from '../lib/store.mjs'
 import { think } from '../lib/think.mjs'
 import { claimSlot } from '../lib/singleton.mjs'
+import { splitMessage } from '../lib/split.mjs'
 import { claimBrain, heartbeatBrain } from '../lib/brain.mjs'
 import { log, buildStamp } from '../lib/log.mjs'
 import { nextWait, composeUserText, MIN_GAP_MS } from '../lib/batch.mjs'
@@ -332,7 +333,7 @@ export function listen({ root = ROOT, reply = true, chat = think, socket = null 
         // 出门前扫一遍凭据形态：她上下文里有 secrets/，复述出来就飞到群里了
         const masked = redact(r.text)
         if (masked.hits.length) log('qq', '出站打码', { kinds: masked.hits, len: r.text.length })
-        await send(isGroup ? 'group' : 'private', isGroup ? ev.group_id : senderId, masked.text)
+        await sendVerified(isGroup ? 'group' : 'private', isGroup ? ev.group_id : senderId, masked.text, root)
         lastSentAt.set(key, Date.now())
         replies += 1
         console.log(`[qq] 回 ${who}（${batch.parts.length} 句合成一次）：${r.text.slice(0, 60)}`)
@@ -375,7 +376,45 @@ export function listen({ root = ROOT, reply = true, chat = think, socket = null 
 }
 
 /** 发一条消息（返回 action 的 echo 结果） */
-export async function send(kind, target, message) {
+export /**
+ * 切段 + 逐段确认（她的要求 2026-10-30 00:10：断了要自己知道）。
+ *
+ * 回执里 retcode !== 0 或拿不到 message_id 就算这段没送到，重试一次；
+ * 还不行就记一条 action（ok:false），下一轮她能看见「刚才有一段没发出去」。
+ */
+async function sendVerified(kind, target, message, root) {
+  const parts = splitMessage(String(message ?? ''))
+  const results = parts.map(() => false)
+  for (let i = 0; i < parts.length; i += 1) {
+    for (let attempt = 0; attempt < 2 && !results[i]; attempt += 1) {
+      try {
+        const r = await send(kind, target, parts[i])
+        const ok = (r?.status === undefined || r.status === 'ok' || r.status === 'async') && Number(r?.retcode ?? 0) === 0 && Boolean(r?.data?.message_id ?? r?.message_id)
+        results[i] = ok
+        if (!ok) console.warn('[qq] 这段回执不对:', JSON.stringify(r).slice(0, 160))
+      } catch (err) {
+        console.error('[qq] 这段发送失败:', err?.message ?? err)
+      }
+    }
+  }
+  const failed = results.map((ok, i) => (ok ? -1 : i)).filter((i) => i >= 0)
+  if (parts.length > 1 || failed.length) {
+    log('qq', '分段发送', { parts: parts.length, failed: failed.length })
+  }
+  if (failed.length && root) {
+    // 给下一轮留证据：她自己能看见"哪一段没送到"
+    try {
+      appendEvent(root, {
+        type: 'action', actor: 'self', surface: 'qq',
+        text: `有一段没送到（第 ${failed.map((i) => i + 1).join('、')} 段 / 共 ${parts.length} 段）`,
+        meta: { kind: 'send-failed', parts: parts.length, failed },
+      })
+    } catch { /* 记不上也不能挡住回话 */ }
+  }
+  return { parts: parts.length, failed }
+}
+
+async function send(kind, target, message) {
   const ws = open()
   await new Promise((resolve, reject) => {
     ws.addEventListener('open', resolve, { once: true })
