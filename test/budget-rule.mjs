@@ -19,9 +19,9 @@ const ok = (cond, label, extra = '') => {
 {
   ok(DEFAULTS.askBeforeCut === true, '默认先问，不替她砍')
   ok(THRESHOLD === 0.85, '到线点是 85%')
-  ok(JSON.stringify(cutSequence(DEFAULTS)) === '["narrative","people","summary"]', '没填顺序时用默认顺序')
+  ok(JSON.stringify(cutSequence(DEFAULTS)) === '["summary","narrative","people","recall","commit"]', '没填顺序时先砍摘要（冗余最重）')
   ok(JSON.stringify(cutSequence({ cutOrder: ['people'] })) === '["people"]', '她填了顺序就按她的')
-  ok(JSON.stringify(cutSequence({ cutOrder: ['乱写'] })) === '["narrative","people","summary"]', '写错名字就退回默认，不炸')
+  ok(JSON.stringify(cutSequence({ cutOrder: ['乱写'] })) === '["summary","narrative","people","recall","commit"]', '写错名字就退回默认，不炸')
 }
 
 {
