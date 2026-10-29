@@ -252,6 +252,20 @@ for (let i = 0; i < comps.length; i += 2) {
   }
 }
 
+// 前端单文件的"源/产物"必须一致（拆分后的防呆：别手改生成文件）
+{
+  const dir = path.join(HER, 'plugin', 'src', 'parts')
+  const out = path.join(HER, 'plugin', 'lib', 'client.js')
+  if (!fs.existsSync(dir)) N('前端还没拆段（plugin/src/parts 不存在）')
+  else {
+    const parts = fs.readdirSync(dir).filter((f) => f.endsWith('.js')).sort()
+    const joined = parts.map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('')
+    const cur = fs.readFileSync(out, 'utf8')
+    if (joined === cur) Y(`client.js 和 src/parts 一致（${parts.length} 段）`)
+    else W('client.js 和 src/parts 不一致：改代码请改段文件，再跑 node tools/build-client.mjs')
+  }
+}
+
 // 联系 DS 的通道必须带身份校验（不是靠她自己判断）
 {
   const tc = readSrc('lib/toolcall.mjs')

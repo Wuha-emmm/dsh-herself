@@ -104,3 +104,14 @@
 | 怎么退 | git revert 该提交 |
 | 影响 | 她翻 backlog 时看到的是真还缺的东西，不是已经做完的 |
 | 提交 | d0203b0 |
+
+## 2026-10-29 19:20 client.js 开始拆：源在 plugin/src/parts，产物仍是一个文件
+
+| 项 | 内容 |
+|---|---|
+| 动了什么 | client.js 拆成 5 段（head / 两段 CSS / 中间逻辑 / 尾部），新增 tools/build-client.mjs 负责拼接并校验与 HEAD 一致；体检加一条'源与产物一致' |
+| 为什么 | 宿主用的是 window.__ModuleLoader__.load({factory})，不是 ESM，拆成 import 宿主认不了；只能拆源、拼产物 |
+| 谁提的 | 我（DS） |
+| 怎么退 | 删 plugin/src/parts 与 build-client.mjs，改回直接编辑 client.js |
+| 影响 | 以后改前端改段文件，手改生成文件会被体检抓到 |
+| 提交 | d64e18a |
