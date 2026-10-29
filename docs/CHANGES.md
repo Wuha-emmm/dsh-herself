@@ -137,3 +137,14 @@
 | 怎么退 | git revert 该提交 |
 | 影响 | 翻 backlog 看到的是还缺什么，不是已经做完的 |
 | 提交 | cc9cebb |
+
+## 2026-10-29 19:27 docs 全面更新：架构/数据模型/设计/运维
+
+| 项 | 内容 |
+|---|---|
+| 动了什么 | ARCHITECTURE 补邮箱、QQ空间、技能清单、前端拆源四节 + 模块表 4 行（1000 token / 30 次工具上限）；DATA-MODEL 补 surface:qzone、meta.qq voice/segs/qzoneTid、revision-reason、inbox.jsonl 字段表；DESIGN 加『2026-10-30 定下的五条』；OPERATIONS 加改代码/改前端/邮箱/用量/对不上/排查顺序六节 + 历史重写说明 |
+| 为什么 | 这几份文档还停在 600 token / 4 次工具 / 没有空间和邮箱的时候，读的人会被带偏 |
+| 谁提的 | 我（DS） |
+| 怎么退 | git revert 该提交 |
+| 影响 | 接手的人照着 docs 就能跑通今天的流程 |
+| 提交 | 3ef373a |

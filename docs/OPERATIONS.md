@@ -30,7 +30,7 @@ powershell -ExecutionPolicy Bypass -File E:\DSH-herself\stop-her.ps1
 ```powershell
 $node = 'C:\Users\Administrator\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe'
 
-& $node tools/audit.mjs         # 35 项体检：链、BOM、槽位、预算、安全接线…
+& $node tools/audit.mjs         # 体检：链、BOM、槽位、预算、安全接线…（项数以输出为准）
 & $node test/replay.mjs         # 12 条契约回放
 & $node test/derive.mjs         # 派生不变量（可重建/乱序）
 & $node test/budget.mjs         # 事实预算
@@ -112,3 +112,62 @@ Get-Content E:\DSH-herself\logs\trace.jsonl -Tail 1
 - **OneBot 运行时：SnowLuma（默认）** + QQ NT；WebSocket `ws://127.0.0.1:3001`（HTTP 3000 / WebUI 5099），令牌在 `secrets/onebot.token`
   （NapCat 已放弃，只保留回滚：`$env:DSH_QQ_RUNTIME='napcat'` 再跑 `boot.ps1`）
 - DSH（DeepSeek Harness）宿主 + 本插件
+
+## 2026-10-30 新增的流程
+
+### 改完代码，一条命令就够
+
+```powershell
+$node = '<你的 node>'
+& $node tools/audit.mjs            # 必须 0 警告（另有「待看」清单，只报不拦）
+& $node tools/run-tests.mjs        # 必须全绿
+& $node tools/changelog.mjs --title "…" --what "…" --why "…" [--impact "…"]
+```
+
+第三条会**同时**写 `docs/CHANGES.md` 并把通知投进她邮箱——别分两步做，分两步就会漏。
+
+### 改前端
+
+```
+改 plugin/src/parts/*.js  →  node tools/build-client.mjs  →  plugin/lib/client.js
+```
+
+手改生成物会被体检抓（`client.js 和 src/parts 一致`）。
+
+### 她的邮箱
+
+```powershell
+& $node tools/inbox.mjs              # 看两边
+& $node tools/inbox.mjs next         # 领一条（单飞，领了别人领不到）
+& $node tools/inbox.mjs done <ref> "回复"
+& $node tools/inbox.mjs release <ref>
+```
+
+### 看她到底用没用那些手
+
+```powershell
+& $node tools/tool-usage.mjs         # 窗口起点写死在 logs/tool-usage-start.json
+& $node tools/pick-review.mjs        # 挑判断的记录
+& $node tools/pick-review.mjs nomatch 5
+```
+
+### 提交和改动单对不上
+
+```powershell
+& $node tools/link-check.mjs         # 列出七天内碰过代码、却挂不上改动单的提交
+& $node tools/link-check.mjs --post  # 整张清单投进她邮箱（只报不拦）
+```
+
+### 故障排查顺序
+
+1. `tools/brain.mjs status` —— 谁在思考、心跳多久；
+2. `tools/audit.mjs` —— 47 项里哪项红了；
+3. `logs/dsh-herself.log` 末尾 —— 启动时间、build 戳；
+4. `logs/trace.jsonl` —— 她那一轮看到了什么 facts、用了哪只手；
+5. 还是不对：`logs/tool-calls.jsonl` 看每次工具调用的参数和返回长度。
+
+## 历史重写过（2026-10-30）
+
+公开仓库里曾经出现过一个 QQ 号（当样例数据用）。按主人的"清"，82 个提交全部重写、
+`1363309111` → `REDACTED_QQ`，强推。**现在所有 commit hash 都和重写前不一样**：
+引用旧 hash 的文档/链接会失效。GitHub 侧未引用对象可能保留一段时间。

@@ -10,7 +10,7 @@
   "id": "01M63VYNN80000000001XA2XQ2",       // ULID（时间有序、26 位）
   "ts": "2026-10-29T20:47:44.000+08:00",    // 发生时间（她的事件都带时区）
   "life": "life_t",                          // 哪一辈子（支持重建/迁移）
-  "surface": "qq",                           // 从哪个界面来的：qq / dsh / system
+  "surface": "qq",                           // qq / dsh / system / qzone（她读到的空间内容）
   "type": "utterance",                       // 见下表
   "actor": "self",                           // self / other:<id> / system
   "acl": { "visibility": "private" },        // private / owner / public
@@ -115,3 +115,25 @@ secrets/
   onebot.token       OneBot 访问令牌
 sandbox/             她唯一能写文件的目录
 ```
+
+## 新增字段（2026-10-30）
+
+`meta.qq` 里现在可能有：
+
+| 字段 | 含义 |
+|---|---|
+| `voice` | 语音段的原始数据（`file` / `url` / `duration`）——`voice_text` 和 `get_record` 都靠它 |
+| `segs` | 非文本消息段（reply / forward / image / face / record / at），面板按它标「引用/转发/图片」 |
+| `qzoneTid` / `qzoneUin` | 这条 encounter 来自空间：哪条说说、是谁发的 |
+
+`meta{key:'revision-reason'}`：她给某条改口判断补的理由，**原文照录，不截断**。
+
+## 邮箱（另一份只追加日志）
+
+`life/inbox.jsonl`：她和 DSH 的往来。
+
+| 字段 | 含义 |
+|---|---|
+| `from` / `kind` | `her`/`dsh`；`question` / `answer` / `claim` / `release` |
+| `ref` | claim/answer/release 指向哪条 question |
+| `seenAt` / `herSeenId` | 谁读到哪一条（按 id，不按时间——同一毫秒会漏） |

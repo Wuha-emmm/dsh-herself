@@ -23,11 +23,11 @@
         ▼
 ④ 组装提示词（lib/think.mjs · factsOf）
    核心 → 最近 → 判断 → 作息 → 回忆 → 承诺 → 摘要 → 拒绝 → 群里人 → 叙事
-   全部经过 lib/budget.mjs 按优先级裁到 600 token 以内
+   全部经过 lib/budget.mjs 按优先级裁（上限 1000，**砍哪类由她定**，见 `sandbox/预算规则.json`）
         │
         ▼
 ⑤ 她说话（lib/think.mjs → lib/toolcall.mjs）
-   工具回合最多 4 次；带 tools 时 reasoning_content 原样回传
+   工具回合最多 30 次（2026-10-30 从 4 提上来：逛空间要四步，4 次永远差一步）；带 tools 时 reasoning_content 原样回传
    收尾强制不说话只输出文本（thinking 关闭）
         │
         ▼
@@ -45,11 +45,15 @@
 | `lib/recall.mjs` | BM25 检索 + 强度门控 + 三态 | 不塞"看起来相关"的垃圾 |
 | `lib/forget.mjs` | 热/温/冷三层冷却 | 不删事件（只决定进不进提示词） |
 | `lib/budget.mjs` | 事实按优先级配预算 | 不丢核心事实 |
+| `lib/inbox.mjs` | 她 ↔ DSH 的邮箱（单条认领、只追加） | 同一条不会被处理两次 |
+| `lib/qzone.mjs` | 空间的读与写、把读到的东西绑到人 | 她真能自己去逛 |
+| `lib/skills.mjs` | 从工具表生成"你有什么手" | 能力清单不会和工具表脱节 |
+| `lib/budget-rule.mjs` | 到 85% 时问还是砍（规则她定） | 不替她做决定 |
 | `lib/screen.mjs` | 别人发来的话，标记注入 | 不隐藏原话（会被用来瞒她） |
 | `lib/outbound.mjs` | 出站凭据打码 | 不拦正常对话 |
 | `lib/gate.mjs` | 公共动作审批（24h 许可） | 不拦她的普通回话 |
 | `lib/think.mjs` | 组装事实 → 调模型 → 写 utterance | 不给指令式提示词 |
-| `lib/toolcall.mjs` | 工具回合（11 只手） | 不无限调（预算 4 次） |
+| `lib/toolcall.mjs` | 工具回合（22 只手） | 不无限调（上限 30 次） |
 | `hands/qq.mjs` | OneBot 监听、攒话、发消息 | 不直接改她的记忆 |
 | `plugin/lib/*` | DSH 面板 + 后端路由 | 不写她的人格 |
 
@@ -74,7 +78,7 @@
 
 ## 记忆的四层投递
 
-每轮最多 600 token，按优先级分配（`lib/budget.mjs` 的 `PRIO`）：
+每轮上限 1000 token，按优先级分配（`lib/budget.mjs` 的 `PRIO`）；到 85% 时怎么办由她定：
 
 ```
 CORE 0     第几天 / 现在几点 / 最早记得什么     ← 永不丢
@@ -102,5 +106,48 @@ NARRATIVE 9 她回看过自己
 
 - `logs/dsh-herself.log`：一行一条，带 pid + 代码出厂时间（buildStamp）
 - `logs/trace.jsonl`：每一轮的事实、检索命中、工具调用、推理、用量（**不含**事件流）
-- `tools/audit.mjs`：35 项体检（链、BOM、槽位、预算、安全接线…）
+- `tools/audit.mjs`：体检（链、BOM、槽位、预算、安全接线、改动单通知、前端源产物一致…），0 警告才算过；另有「待看」清单只报不拦
 - 面板：会话列表 → 那一轮 → 整卡思考过程
+
+## 她 ↔ DSH 的邮箱（2026-10-30）
+
+两个进程之间唯一的双向通道，落在 `life/inbox.jsonl`（同样只追加）。
+
+```
+她 ──ask_dsh──→ inbox.jsonl ──claimNext──→ DSH 领一条（单飞，防重复处理）
+DSH ──answer──→ inbox.jsonl ──inboxLine──→ 她下一轮的提示词里一行
+```
+
+- **单条认领**：领了就是 `claim`，别人再领会被告知"已经有一条在处理"；10 分钟没答自动失效；
+- **她能看到的长度**：≤200 字直接给全文，更长就在正文里给「第一句 + 全文在 sandbox/DSH-回话.md 第几节」；
+- **写权限**：`ask_dsh` 只对主人开、只在私聊、每小时 6 条——写死在执行入口，不走她的判断。
+
+## QQ 空间（2026-10-30）
+
+走 OneBot 原生动作，不用浏览器：`get_qzone_feeds` / `get_qzone_msg_list`（好友要 `target_uin`）/
+`get_qzone_msg_detail` / `comment_qzone` / `like_qzone` / `send_qzone_msg`。
+
+她读到好友说说时，会写一条 `surface: 'qzone'` 的 encounter，`actor` 是那个人——
+所以"认人"那套自然把这条绑到他名下；私聊他时提示词里会带一行「他 N 天前在空间发过：…」。
+
+## 技能清单（她得知道自己有什么手）
+
+`lib/skills.mjs` 从工具表生成一行，进每轮提示词：
+
+> 你手上有 N 只手（…）。空间那边你想逛就逛：…都开着，没人拦你。用不用你自己定。
+
+教训：工具开了但清单没更新，她会照着旧清单说"我没有这个通道"——空间那次就是这样。
+
+## 前端：拆源不拆产物（2026-10-30）
+
+`plugin/lib/client.js` 不是 ESM，走宿主的 `window.__ModuleLoader__.load({ factory })`，
+所以拆成 `import` 宿主认不了。做法是：
+
+```
+plugin/src/parts/01-head.js … 05-rest.js   ← 人改这里
+        │  node tools/build-client.mjs
+        ▼
+plugin/lib/client.js                        ← 生成物，仍然单文件
+```
+
+体检有一条查"源与产物一致"，手改生成物会被抓。
