@@ -4,16 +4,47 @@
 //   node tools/inbox.mjs all                 # 看全部
 //   node tools/inbox.mjs reply "解释内容"      # 回给她（她会看到）
 //   node tools/inbox.mjs order "修复指令"      # 主人口吻的指令（也算给她的话）
-import { all, pendingForDsh, pendingForHer, post, markSeen } from '../lib/inbox.mjs'
+import { all, pendingForDsh, pendingForHer, post, markSeen, claimNext, answer, release, openClaim } from '../lib/inbox.mjs'
 
 const ROOT = 'E:/DSH-herself/life'
 const [cmd, ...rest] = process.argv.slice(2)
+const rest_all = () => rest
 
 if (cmd === 'reply' || cmd === 'order') {
   const text = rest.join(' ').trim()
   if (!text) { console.error('要写内容'); process.exit(1) }
   const e = post(ROOT, { from: cmd === 'order' ? 'owner' : 'dsh', kind: cmd === 'order' ? 'order' : 'answer', text })
   console.log(`${cmd === 'order' ? '指令' : '回复'}已投递：${e.id}`)
+  process.exit(0)
+}
+
+if (cmd === 'next') {
+  // 一次只领一条：领了别的地方就领不到（她的要求：避免重复执行）
+  const r = claimNext(ROOT)
+  if (r.ok) {
+    console.log('领到:' , r.item.id)
+    console.log('内容:', r.item.text)
+  } else if (r.busy) {
+    console.log('已经有一条在处理（' + r.busy.ref + '，' + Math.round(r.busy.ageMs / 1000) + ' 秒前领的），先答完它')
+  } else {
+    console.log('没有待处理的')
+  }
+  process.exit(0)
+}
+
+if (cmd === 'done') {
+  const [ref, ...rest] = rest_all()
+  const text = rest.join(' ').trim()
+  if (!ref || !text) { console.error('用法: done <ref> <回复内容>'); process.exit(1) }
+  answer(ROOT, ref, text)
+  console.log('已回复并解锁:', ref)
+  process.exit(0)
+}
+
+if (cmd === 'release') {
+  const [ref, ...rest] = rest_all()
+  release(ROOT, ref, rest.join(' '))
+  console.log('已放回:', ref)
   process.exit(0)
 }
 
