@@ -19,6 +19,7 @@ import { derive, renderForSurface } from '../../lib/derive.mjs'
 import { openLogin, listTabs } from '../../hands/login.mjs'
 import { checkSessions } from '../../hands/session.mjs'
 import { targetOf, sniffImage } from '../../lib/avatar.mjs'
+import { reasonOf } from '../../lib/revision.mjs'
 import { claimSlot } from '../../lib/singleton.mjs'
 import { effectivePrefs } from '../../lib/prefs.mjs'
 import { buildLive, readTurn } from '../../lib/live.mjs'
@@ -326,7 +327,7 @@ export function apply(ctx, baseConfig = {}) {
           counts: self.counts,
           refuted: self.refuted,
           narrative: self.narrative,
-          beliefs: self.beliefs.slice(-60),   // 面板要看全部（以前只给 5 条，判断多了就看不全）
+          beliefs: self.beliefs.slice(-60).map((b) => ({ ...b, reason: reasonOf(events, b.id) })),   // 面板要看全部（以前只给 5 条，判断多了就看不全）
           readings: self.readingList ?? [],
           candidateStances: self.candidateStances ?? [],
           wake: (() => {

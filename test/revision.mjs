@@ -5,6 +5,10 @@
 //
 // 所以「只注入现在算数的判断」是不够的——她得能看到自己改过口。
 import { factsOf } from '../lib/think.mjs'
+import { recordReason } from '../lib/revision.mjs'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
 
 let pass = 0
 let fail = 0
@@ -44,6 +48,22 @@ const base = [
   const { readFileSync } = await import('node:fs')
   const src = readFileSync(new URL('../lib/think.mjs', import.meta.url), 'utf8')
   ok(src.includes('没记着的事就说没记着，别编'), '规则里给了她"说不知道"的许可')
+}
+
+
+// 她在 2026-10-29 23:52 指出：note_reason 写进去的是原话，但读出来被压成一句总结。
+// 根因是"读的那一层"压根没读理由——只有判断文本（还截到 50 字）。
+{
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'why-'))
+  const { appendEvent, readEvents } = await import('../lib/store.mjs')
+  const seed = appendEvent(root, { type: 'seed', actor: 'system', surface: 'system', text: '她醒了' })
+  const a = appendEvent(root, { type: 'claim', actor: 'self', surface: 'qq', text: '只留总结不留原始记录，条目会越攒越像档案', refs: [seed.id], evidence: [seed.id] })
+  appendEvent(root, { type: 'claim', actor: 'self', surface: 'qq', text: '只留总结不留原始记录，条目会越攒越像档案了', refs: [seed.id], evidence: [seed.id] })
+  const why = '只留总结不留原始记录，条目会越攒越像档案，不会变成自己的东西。'
+  recordReason(root, a.id, why)
+  const line = factsOf(readEvents(root), now, '', 'qq:private:10001').out.find((x) => x.includes('改过口'))
+  ok(String(line || '').includes(why), '她填的理由原话，一个字不走样地读得回来', String(line || '').slice(0, 80))
+  fs.rmSync(root, { recursive: true, force: true })
 }
 
 console.log(`\n${pass} 通过 / ${fail} 失败`)
