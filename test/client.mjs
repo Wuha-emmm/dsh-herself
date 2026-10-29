@@ -140,7 +140,7 @@ ok(Boolean(walk(trows[0]).find((c) => cls(c).includes('trow-ava'))), '每行左�
   const seps = walk(conv).filter((c) => cls(c) === 'sep')
   ok(seps.length === 1, '同一段对话只在开头插一个时间条（间隔不到 10 分钟不插）', String(seps.length))
   // 进来要贴底显示最新那条，而不是停在最上面
-  ok(/dataset\.seen/.test(SRC) && /el\.scrollTop = el\.scrollHeight/.test(SRC), '进会话先贴底（显示最新的，不是最旧的）')
+  ok(/dataset\.seen/.test(SRC) && /target\.scrollTop = target\.scrollHeight/.test(SRC) && /parentElement/.test(SRC), '进会话先贴底（往上找真正可滚动那层，布局前重试）')
   ok(/思考 120 字/.test(String(walk(rightC).find((c) => cls(c) === 'badge')?.children?.[0] ?? '')), '气泡里带「思考 N 字」')
 }
 

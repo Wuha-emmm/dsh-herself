@@ -857,15 +857,28 @@ window.__ModuleLoader__.load({
       const cur = rows.find((r) => r.key === view)
       // 顺序跟 QQ 一致：上旧下新（以前 reverse 过，看起来像倒着长）
       const msgs = view === 'list' ? [] : all.filter((x) => keyOf(x) === view)
-      // 进来先贴底（显示最新的），对应 QQ 的观感。
-      // 不用 ref：这个运行时不一定支持，直接在 effect 里找 DOM。
+      // 进来先贴底（显示最新的）。两个坑：
+      //   ① 卡片里真正滚动的是 .feed，.msgs 只是普通块——所以要往上找可滚动的那层；
+      //   ② effect 可能在布局之前跑，那时 scrollHeight 还是 0，需要重试几次。
       useEffect(() => {
         if (view === 'list') return
-        const el = document.querySelector('.dshell-card .dlive .msgs')
-        if (!el) return
-        const first = !el.dataset.seen || el.dataset.seen !== view
-        const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80
-        if (first || nearBottom) { el.scrollTop = el.scrollHeight; el.dataset.seen = view }
+        const tick = (n) => {
+          const start = document.querySelector('.dshell-card .dlive .msgs')
+          if (!start) return
+          let el = start
+          while (el && el.scrollHeight <= el.clientHeight + 2) el = el.parentElement
+          const target = el || start
+          const first = target.dataset.seen !== view
+          const nearBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 80
+          if (first || nearBottom) {
+            target.scrollTop = target.scrollHeight
+            target.dataset.seen = view
+          }
+          if (n < 5 && (target.scrollHeight <= target.clientHeight + 2 || first)) {
+            setTimeout(() => tick(n + 1), 60)
+          }
+        }
+        tick(0)
       }, [view, msgs.length])
       // 时间分隔条：相邻两条隔了 10 分钟以上（或跨天）就插一个时间，像 QQ 一样
       const rowsWithSep = []
