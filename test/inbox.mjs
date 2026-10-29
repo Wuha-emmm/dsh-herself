@@ -36,8 +36,12 @@ const root = fs.mkdtempSync(path.join(os.tmpdir(), 'inbox-'))
   post(root, { from: 'owner', kind: 'order', text: '把预算拉到 8192' })
   ok(inboxLine(root).includes('主人'), '主人的指令也走同一条通道', inboxLine(root))
 
-  ok(all(root).length === 3, '全部条目都留着（append-only）')
-  ok(all(root).map((e) => e.from).join(',') === 'her,dsh,owner', '顺序按投递先后')
+  // 长回复也不许切在半句上（她的原话：截断会让人以为自己没写全）
+  post(root, { from: 'dsh', kind: 'answer', text: '第一句很短。'.repeat(3) + '这一句特别长'.repeat(40) + '。收尾。' })
+  const long = inboxLine(root)
+  ok(!/[^。！？」]$/.test(long.replace(/^DSH 那边回你话了：/, '').replace(/（DSH）/, '')), '不切在半句（以标点收尾）', long.slice(-12))
+  ok(all(root).length === 4, '全部条目都留着（append-only）')
+  ok(all(root).map((e) => e.from).join(',') === 'her,dsh,owner,dsh', '顺序按投递先后')
 }
 
 fs.rmSync(root, { recursive: true, force: true })
