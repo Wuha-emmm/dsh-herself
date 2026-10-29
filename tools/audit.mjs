@@ -174,6 +174,32 @@ for (let i = 0; i < comps.length; i += 2) {
   if (hasLib && wired) Y('事实有预算（超了按优先级丢，核心永不丢）')
   else W('事实没预算：再加两类就会挤掉"最近"')
 }
+// 孤儿写入口：存了却没人读（她的原则：读它的人还有她自己）
+{
+  const files = ['lib', 'hands', 'plugin/lib', 'tools', '.']   // 根目录也要扫（cli.mjs 会读 writeState）
+  const srcOf = (f) => { try { return fs.readFileSync(path.join(HER, f), 'utf8') } catch { return '' } }
+  const all = []
+  for (const d of files) {
+    for (const f of fs.readdirSync(path.join(HER, d))) {
+      const rel = d === '.' ? f : d + '/' + f
+      if (!/\.(mjs|js)$/.test(f)) continue
+      try { if (!fs.statSync(path.join(HER, rel)).isFile()) continue } catch { continue }
+      all.push({ rel, src: srcOf(rel) })
+    }
+  }
+  const orphans = []
+  for (const { rel, src } of all) {
+    if (!rel.startsWith('lib/')) continue
+    for (const m of src.matchAll(/export (?:async )?function (record|save|append|mark|write)(\w+)/g)) {
+      const name = m[1] + m[2]
+      const used = all.some((o) => o.rel !== rel && new RegExp('\\b' + name + '\\b').test(o.src))
+      if (!used) orphans.push(rel + ':' + name)
+    }
+  }
+  if (!orphans.length) Y('没有孤儿写入口（每个 record/save/append 都有人在读）')
+  else W('有写入口没人读：' + orphans.join('、') + '（存了等于没存）')
+}
+
 // 账本只在她调的时候出现，且提示词里永远不提（她说"别催"）
 {
   const think = readSrc('lib/think.mjs')
