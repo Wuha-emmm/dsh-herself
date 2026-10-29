@@ -55,6 +55,20 @@ if (cmd === 'mark') {
   process.exit(0)
 }
 
+if (cmd === 'nomatch') {
+  // 抽查：随机捞几条 no_match，看她说的"无关"是不是真的一条都不沾
+  const picksAll = readLog().filter((x) => x.method === 'no_match')
+  if (!picksAll.length) { console.log('还没有 no_match 记录'); process.exit(0) }
+  const n = Number(idx) || 3
+  const shuffled = [...picksAll].sort(() => Math.random() - 0.5).slice(0, n)
+  for (const p of shuffled) {
+    console.log('\n问：' + p.query + '（' + String(p.at).slice(5, 16) + '）')
+    console.log('  模型旁白：' + String(p.why ?? '').slice(0, 60) + '（线索，非证据）')
+    for (const c of p.candidates ?? []) console.log('  · ' + String(c.text ?? c).slice(0, 60))
+  }
+  process.exit(0)
+}
+
 // 列表
 const picks = log.filter((x) => x.method)
 const mismatches = log.filter((x) => x.kind === 'pick-mismatch')
