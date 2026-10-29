@@ -114,6 +114,8 @@ QQ / 群消息 ─┐
 6. **安全是硬边界**：词法规则兜底，真正的判断留给她。
 7. **存储必须有读者**：每个写入口都要能回答"谁读它、读的时候会不会被截断"。
 
+记忆怎么实现（存储 / 派生 / 投递 / 检索 / 预算 / 边界）：[`docs/MEMORY.md`](docs/MEMORY.md)
+
 细节见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/DATA-MODEL.md`](docs/DATA-MODEL.md) ·
 [`docs/DESIGN.md`](docs/DESIGN.md) · [`docs/CHANGES.md`](docs/CHANGES.md)（改动单）
 
