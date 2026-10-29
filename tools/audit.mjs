@@ -186,7 +186,8 @@ for (let i = 0; i < comps.length; i += 2) {
 {
   const hasLib = fs.existsSync(path.join(HER, 'lib', 'qzone.mjs'))
   const wired = /name: 'read_qzone'/.test(readSrc('lib/toolcall.mjs'))
-  const readOnly = /export async function feedList/.test(hasLib ? fs.readFileSync(path.join(HER, 'lib', 'qzone.mjs'), 'utf8') : '') && !/publish|like|comment/i.test(hasLib ? fs.readFileSync(path.join(HER, 'lib', 'qzone.mjs'), 'utf8') : '')
+  const qz = hasLib ? fs.readFileSync(path.join(HER, 'lib', 'qzone.mjs'), 'utf8') : ''
+  const readOnly = /export async function feedList/.test(qz) && !/export async function (publish|like|comment)/i.test(qz)
   if (hasLib && wired && readOnly) Y('空间的只读入口通了（read_qzone，只能看不能动）')
   else W(`空间入口不完整：${hasLib ? '' : '缺 lib/qzone '}${wired ? '' : '缺工具 '}${readOnly ? '' : '含写操作但没审批'}`)
 }
