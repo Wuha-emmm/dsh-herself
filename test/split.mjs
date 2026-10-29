@@ -20,9 +20,9 @@ const ok = (cond, label, extra = '') => {
 
 {
   const long = '第一句说的是这个。第二句接着讲那个，里面还有逗号。第三句收尾。'.repeat(30)
-  const parts = splitMessage(long, { max: 800 })
+  const parts = splitMessage(long, { max: 300 })
   ok(parts.length > 1, '长文切成了多段', String(parts.length))
-  ok(Math.max(...parts.map((p) => p.length)) <= 800, '每段都不超上限', String(Math.max(...parts.map((p) => p.length))))
+  ok(Math.max(...parts.map((p) => p.length)) <= 300, '每段都不超上限', String(Math.max(...parts.map((p) => p.length))))
   ok(parts.every((p) => /[。！？…；]$/.test(p.trim())), '每段都以标点收尾（不留半句）', JSON.stringify(parts.map((p) => p.slice(-1))))
   ok(parts.join('') === long, '拼回去和原文一字不差（没有丢字）')
 }
