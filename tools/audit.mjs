@@ -390,4 +390,12 @@ for (const m of ok) console.log('  ✓ ' + m)
 if (warnings.length) { console.log('\n=== 警告 ==='); for (const m of warnings) console.log('  ! ' + m) }
 if (problems.length) { console.log('\n=== 问题 ==='); for (const m of problems) console.log('  ✗ ' + m) }
 console.log(`\n结果：${ok.length} 通过 / ${warnings.length} 警告 / ${problems.length} 问题`)
+// 她的第一条建议：检查脚本自己也得有人读。
+// 落成文件，下一轮对话开始时会贴到她眼前（think.mjs 读这个）。
+try {
+  fs.mkdirSync(path.join(HER, 'logs'), { recursive: true })
+  fs.writeFileSync(path.join(HER, 'logs', 'audit-status.json'), JSON.stringify({
+    at: new Date().toISOString(), ok: ok.length, warnings, problems,
+  }, null, 2), 'utf8')
+} catch { /* 写不了也不该挡住体检本身 */ }
 process.exit(problems.length ? 1 : 0)
