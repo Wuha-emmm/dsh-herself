@@ -15,9 +15,13 @@ import path from 'node:path'
 import { readEvents } from '../lib/store.mjs'
 import { liveEvents } from '../lib/derive.mjs'
 import { candidates, ledgerReply } from '../lib/ledger.mjs'
+import { fileURLToPath } from 'node:url'
 
-const ROOT = 'E:/DSH-herself/life'
-const CFG = 'E:/DSH-herself/logs/ledger.json'
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+const ROOT = path.join(HER, 'life')
+const CFG = path.join(HER, 'logs/ledger.json')
 const KINDS = ['sleep', 'promise', 'changed']
 const LABEL = { sleep: '要睡没睡', promise: '答应过的事', changed: '改口' }
 

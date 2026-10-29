@@ -10,8 +10,13 @@
 import { readEvents, appendEvent } from '../lib/store.mjs'
 import { liveEvents } from '../lib/derive.mjs'
 import { publicAllowed, APPROVAL_KEY, APPROVAL_TTL_MS } from '../lib/gate.mjs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const ROOT = 'E:/DSH-herself/life'
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+const ROOT = path.join(HER, 'life')
 const cmd = String(process.argv[2] ?? '').trim()
 const ev = liveEvents(readEvents(ROOT))
 

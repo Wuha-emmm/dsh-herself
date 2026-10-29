@@ -6,8 +6,13 @@
 import { readEvents } from '../lib/store.mjs'
 import { liveEvents } from '../lib/derive.mjs'
 import { buildIndex, search } from '../lib/recall.mjs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const events = liveEvents(readEvents('E:/DSH-herself/life'))
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+const events = liveEvents(readEvents(path.join(HER, 'life')))
 const content = events.filter((e) => ['utterance', 'encounter', 'refusal', 'revision', 'narration'].includes(e.type))
 const index = buildIndex(content)
 

@@ -11,7 +11,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
 
-const HER = 'E:/DSH-herself'
+const HER = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\//, '')), '..')
 const DIRS = ['lib/', 'hands/', 'plugin/', 'tools/']
 
 export function unlinkedCommits(days = 7) {

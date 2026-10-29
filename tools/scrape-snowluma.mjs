@@ -4,9 +4,13 @@
 // 她需要一份能自己翻的目录（"我会什么"的原始依据），而不是等我们喂。
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 const URL = 'https://snowluma.github.io/zh/docs/api'
-const OUT = 'E:/DSH-herself/sandbox/SnowLuma-API速查.md'
+const OUT = path.join(HER, 'sandbox/SnowLuma-API速查.md')
 
 const html = await (await fetch(URL, { headers: { 'user-agent': 'herself/1.0' } })).text()
 

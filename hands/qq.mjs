@@ -19,6 +19,9 @@ import { backfill } from './history.mjs'
 import { onebot } from './qzone.mjs'
 import { describe } from '../lib/vision.mjs'
 
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
 const here = path.dirname(fileURLToPath(import.meta.url))
 const selfFile = path.join(here, '..', 'logs', 'self.json')
 const ROOT = path.resolve(process.env.DSH_HERSELF_ROOT || path.join(here, '..', 'life'))
@@ -243,7 +246,7 @@ export function listen({ root = ROOT, reply = true, chat = think, socket = null 
       const seg = Array.isArray(ev.message) ? ev.message.find((s) => s.type === 'image') : null
       const em = String(seg?.data?.emoji_id ?? '')
       if (em.length !== 32) return
-      const f = 'E:/DSH-herself/sandbox/stickers.json'
+      const f = path.join(HER, 'sandbox/stickers.json')
       const all = JSON.parse(fs.readFileSync(f, 'utf8'))
       all[em] = { ...(all[em] || {}), packageId: String(seg.data.emoji_package_id ?? ''), key: String(seg.data.key ?? ''), url: String(seg.data.url ?? all[em]?.url ?? '') }
       fs.writeFileSync(f, JSON.stringify(all, null, 2), 'utf8')
@@ -313,7 +316,7 @@ export function listen({ root = ROOT, reply = true, chat = think, socket = null 
               } catch { /* 看不到就算了 */ }
             }            if (em && rename) {
               try {
-                const f = 'E:/DSH-herself/sandbox/stickers.json'
+                const f = path.join(HER, 'sandbox/stickers.json')
                 const all = JSON.parse(fs.readFileSync(f, 'utf8'))
                 all[em] = { ...(all[em] || {}), name: rename, at: new Date().toISOString() }
                 fs.writeFileSync(f, JSON.stringify(all, null, 2), 'utf8')

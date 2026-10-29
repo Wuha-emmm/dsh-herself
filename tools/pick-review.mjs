@@ -8,9 +8,14 @@
 //   node tools/pick-review.mjs                  # 看所有挑过的记录（含误配）
 //   node tools/pick-review.mjs mark <序号> <该挑的 claim id> [一句说明]
 import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const FILE = 'E:/DSH-herself/logs/pick.jsonl'
-const evFile = 'E:/DSH-herself/life/events.jsonl'
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+const FILE = path.join(HER, 'logs/pick.jsonl')
+const evFile = path.join(HER, 'life/events.jsonl')
 
 const readLog = () => {
   try {

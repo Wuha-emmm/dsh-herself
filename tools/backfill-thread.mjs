@@ -14,8 +14,12 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { readEvents } from '../lib/store.mjs'
 import { liveEvents } from '../lib/derive.mjs'
+import { fileURLToPath } from 'node:url'
 
-const ROOT = 'E:/DSH-herself/life'
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+const ROOT = path.join(HER, 'life')
 const OUT = path.join(ROOT, 'thread-overrides.json')
 const DRY = process.argv.includes('--dry')
 const WINDOW_MS = 6 * 60 * 1000      // 前后 6 分钟之内算"同一段对话"

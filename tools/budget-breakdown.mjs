@@ -8,10 +8,20 @@ import { readEvents } from '../lib/store.mjs'
 import { factsOf } from '../lib/think.mjs'
 import { estimateTokens } from '../lib/budget.mjs'
 
-const HER = 'E:/DSH-herself'
+const HER = HER
 const root = path.join(HER, 'life')
 const out = path.join(HER, 'sandbox', '预算明细.md')
-const thread = process.argv[2] || 'qq:private:REDACTED_QQ'
+// 默认线程从事件里推断（私聊最多的那个），不要把某个人的号写死在公开仓库里
+function guessThread(events) {
+  const count = new Map()
+  for (const e of events) {
+    const t = String(e.meta?.qq?.groupId ? 'qq:group:' + e.meta.qq.groupId : 'qq:private:' + (e.meta?.qq?.senderId || ''))
+    if (/qq:private:$/.test(t)) continue
+    count.set(t, (count.get(t) ?? 0) + 1)
+  }
+  return [...count].sort((a, b) => b[1] - a[1])[0]?.[0] ?? ''
+}
+const thread = process.argv[2] || guessThread(ev)
 
 const ev = readEvents(root)
 const r = factsOf(ev, Date.now(), '', thread, { budgetWatch: false })

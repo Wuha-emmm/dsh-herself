@@ -7,8 +7,13 @@
 //
 // 正常情况不需要它：进程退出会自己释放，僵尸锁超过 90 秒也能被别人接手。
 import { brainStatus, releaseBrain, STALE_MS } from '../lib/brain.mjs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const ROOT = 'E:/DSH-herself/life'
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+const ROOT = path.join(HER, 'life')
 const cmd = String(process.argv[2] ?? 'status').trim()
 const st = brainStatus(ROOT)
 

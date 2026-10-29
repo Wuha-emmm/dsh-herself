@@ -3,6 +3,11 @@
 // 事件流是唯一真相。字段悄悄变了，派生层不会报错，只会安静算错——
 // 这是最难查的一类问题。所以这里把"什么算一条合法事件"钉死。
 import { validateEvent, offenders, EVENT_TYPES } from '../lib/schema.mjs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 let pass = 0
 let fail = 0
@@ -43,7 +48,7 @@ const good = {
   // 真实事件流必须干净——这条如果红了，说明有人改了写入格式
   const fs = await import('node:fs')
   const { readEvents } = await import('../lib/store.mjs')
-  const root = 'E:/DSH-herself/life'
+  const root = path.join(HER, 'life')
   if (fs.existsSync(root + '/events.jsonl')) {
     const ev = readEvents(root)
     const bad = offenders(ev)

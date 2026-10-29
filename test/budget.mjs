@@ -3,6 +3,11 @@
 // 2026-10-29：factsOf 一个人管 8 类事实，每轮 500~576 tok，靠的是"没加太多"而不是"有配额"。
 // 这一层要保证：超预算时按优先级丢，而不是让"最近"被挤掉。
 import { estimateTokens, fitBudget, PRIO } from '../lib/budget.mjs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 let pass = 0
 let fail = 0
@@ -76,7 +81,7 @@ const ok = (cond, label, extra = '') => {
   const { readEvents } = await import('../lib/store.mjs')
   const { factsOf, FACT_BUDGET } = await import('../lib/think.mjs')
   const fs = await import('node:fs')
-  const root = 'E:/DSH-herself/life'
+  const root = path.join(HER, 'life')
   if (fs.existsSync(root + '/events.jsonl')) {
     const ev = readEvents(root)
     const r = factsOf(ev, Date.now(), '', 'qq:private:10001')

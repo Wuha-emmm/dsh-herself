@@ -10,14 +10,18 @@ import path from 'node:path'
 import { readEvents } from '../lib/store.mjs'
 import { liveEvents } from '../lib/derive.mjs'
 import { fingerprint, compare, verdict } from '../lib/drift.mjs'
+import { fileURLToPath } from 'node:url'
 
-const BASE = 'E:/DSH-herself/logs/drift-baseline.json'
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+const BASE = path.join(HER, 'logs/drift-baseline.json')
 const argv = process.argv.slice(2)
 const save = argv.includes('--save')
 const di = argv.indexOf('--days')
 const days = di >= 0 ? Number(argv[di + 1]) || 0 : 0
 
-const events = liveEvents(readEvents('E:/DSH-herself/life'))
+const events = liveEvents(readEvents(path.join(HER, 'life')))
 const to = Date.now()
 const from = days ? to - days * 86400000 : 0
 const fp = fingerprint(events, { from, to })

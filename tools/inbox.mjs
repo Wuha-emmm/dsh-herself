@@ -5,8 +5,13 @@
 //   node tools/inbox.mjs reply "解释内容"      # 回给她（她会看到）
 //   node tools/inbox.mjs order "修复指令"      # 主人口吻的指令（也算给她的话）
 import { all, pendingForDsh, pendingForHer, post, markSeen, claimNext, answer, release, openClaim } from '../lib/inbox.mjs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const ROOT = 'E:/DSH-herself/life'
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+const ROOT = path.join(HER, 'life')
 const [cmd, ...rest] = process.argv.slice(2)
 const rest_all = () => rest
 

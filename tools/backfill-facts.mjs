@@ -12,7 +12,7 @@ import { readEvents } from '../lib/store.mjs'
 import { liveEvents, derive } from '../lib/derive.mjs'
 import { knownPeople } from '../lib/people.mjs'
 
-const HER = 'E:/DSH-herself'
+const HER = HER
 const root = path.join(HER, 'life')
 const outFile = path.join(HER, 'sandbox', '被剪掉的.md')
 

@@ -1,5 +1,5 @@
 // brain.mjs —— 她的嘴：一次 LLM 回合，然后她把话写进事件流
-// 用法：node brain.mjs [--root E:\DSH-herself\life] [--model deepseek-flash] [--dry]
+// 用法：node brain.mjs [--root <repo>\life] [--model deepseek-flash] [--dry]
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'

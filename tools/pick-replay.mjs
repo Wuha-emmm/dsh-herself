@@ -8,9 +8,14 @@
 // 这个工具只做一件事：拿日志里失败过的 query 和当时的候选，换几版 prompt 重放，
 // 看模型是"挑不动"（长度/信息不够）还是"挑得动但描述不清"（任务含糊）。
 import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const PICK = 'E:/DSH-herself/logs/pick.jsonl'
-const EV = 'E:/DSH-herself/life/events.jsonl'
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+
+const PICK = path.join(HER, 'logs/pick.jsonl')
+const EV = path.join(HER, 'life/events.jsonl')
 
 const textOf = new Map()
 for (const line of fs.readFileSync(EV, 'utf8').trim().split('\n')) {
@@ -26,7 +31,7 @@ const unknown = picks.length - real.length
 console.log(`挑判断记录 ${picks.length} 条｜候选可复原（真样本）${real.length} 条｜候选不在她生活里（测试/已删）${unknown} 条`)
 console.log(`  其中 model ${real.filter((p) => p.method === 'model').length} / fallback ${real.filter((p) => p.method === 'fallback').length}`)
 
-const { brief } = await import('file:///E:/DSH-herself/lib/think.mjs')
+const { brief } = await import('file://' + path.join(HER, 'lib/think.mjs'))
 
 const VARIANTS = [
   {

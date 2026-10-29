@@ -12,7 +12,7 @@ import { liveEvents, derive } from '../lib/derive.mjs'
 import { estimateTokens } from '../lib/budget.mjs'
 import { brief } from '../lib/think.mjs'
 
-const HER = 'E:/DSH-herself'
+const HER = HER
 const root = path.join(HER, 'life')
 const ev = readEvents(root)
 const s = derive(liveEvents(ev), Date.now())

@@ -12,7 +12,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-const HER = 'E:/DSH-herself'
+const HER = HER
 const START_FILE = path.join(HER, 'logs', 'tool-usage-start.json')
 const CALLS = path.join(HER, 'logs', 'tool-calls.jsonl')
 const TRACE = path.join(HER, 'logs', 'trace.jsonl')

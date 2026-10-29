@@ -10,6 +10,11 @@ import { readEvents } from '../lib/store.mjs'
 import { liveEvents } from '../lib/derive.mjs'
 import { retrieveScored } from '../lib/think.mjs'
 import { recall } from '../lib/recall.mjs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
+const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 const CJK = /[\u3400-\u9fff]/
 const LAT = /[A-Za-z0-9]/
@@ -19,7 +24,7 @@ const est = (t) => {
   return Math.ceil(a + b / 4 + c / 4)
 }
 
-const root = 'E:/DSH-herself/life'
+const root = path.join(HER, 'life')
 const events = liveEvents(readEvents(root))
 const content = events.filter((e) => ['utterance', 'encounter', 'refusal', 'revision', 'narration'].includes(e.type))
 

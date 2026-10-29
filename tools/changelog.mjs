@@ -15,7 +15,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { post } from '../lib/inbox.mjs'
 
-const HER = 'E:/DSH-herself'
+const HER = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\//, '')), '..')
 const ROOT = path.join(HER, 'life')
 const DOC = path.join(HER, 'docs', 'CHANGES.md')
 
