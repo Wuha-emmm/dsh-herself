@@ -18,7 +18,7 @@ $pidFile = Join-Path $root 'logs\pids.json'
 if (Test-Path $pidFile) {
     try {
         $p = Get-Content $pidFile -Raw | ConvertFrom-Json
-        foreach ($id in @($p.qq, $p.wake)) {
+        foreach ($id in @($p.qq, $p.wake, $p.inbox)) {
             if ($id -and (Get-Process -Id $id -ErrorAction SilentlyContinue)) {
                 Stop-Process -Id $id -Force
                 Write-Output "stopped node $id"
@@ -41,10 +41,11 @@ New-Item -ItemType Directory -Force -Path (Join-Path $root 'logs') | Out-Null
 Set-Content -Path (Join-Path $root 'logs\paused.flag') -Value ((Get-Date).ToString('o')) -Encoding ascii
 Write-Output 'paused: the 5-minute watchdog will not restart her until you press start'
 
-# ---- SnowLuma 运行时：停止时一并关掉（只关 DSH-herself 目录下的，不碰用户自己的 QQ）----
+# ---- 邮箱值班 + SnowLuma 运行时：停止时一并关掉（只关 DSH-herself 目录下的，不碰用户自己的 QQ）----
 Get-CimInstance Win32_Process -Filter "Name='node.exe'" | Where-Object {
-    $_.CommandLine -like '*DSH-herself\SnowLuma*' -or $_.CommandLine -like '*DSH-herself/SnowLuma*'
+    ($_.CommandLine -like '*inbox-worker.mjs*') -or
+    ($_.CommandLine -like '*DSH-herself\SnowLuma*') -or ($_.CommandLine -like '*DSH-herself/SnowLuma*')
 } | ForEach-Object {
     Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
-    Write-Host "stopped SnowLuma pid=$($_.ProcessId)"
+    Write-Host "stopped pid=$($_.ProcessId)"
 }

@@ -70,7 +70,7 @@ if ($Force) {
     }
     # pids.json 记漏的那些，按命令行补杀
     Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue |
-        Where-Object { $_.CommandLine -like '*hands/qq.mjs*' -or $_.CommandLine -like '*wake.mjs*' } |
+        Where-Object { $_.CommandLine -like '*hands/qq.mjs*' -or $_.CommandLine -like '*wake.mjs*' -or $_.CommandLine -like '*inbox-worker.mjs*' } |
         ForEach-Object {
             Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
             Log "force restart: swept orphan node $($_.ProcessId)"
@@ -120,6 +120,7 @@ if ($Runtime -eq 'snowluma') {
 $p = Get-Pids
 $qqAlive = Alive $p.qq
 $wakeAlive = Alive $p.wake
+$inboxAlive = Alive $p.inbox
 
 # 记录是死的、人还活着（孤儿）：认回来，别再多起一个
 if (-not $qqAlive) {
@@ -129,6 +130,11 @@ if (-not $qqAlive) {
 if (-not $wakeAlive) {
     $live = Find-Node '*wake.mjs*'
     if ($live) { $p.wake = $live; $wakeAlive = $true; Log "adopted wake loop pid=$live" }
+}
+# 邮箱值班：她投给 DSH 的单子不能无声堆着（常驻，不靠会话；2026-10-30）
+if (-not $inboxAlive) {
+    $live = Find-Node '*inbox-worker.mjs*'
+    if ($live) { $p | Add-Member -NotePropertyName inbox -NotePropertyValue $live -Force; $inboxAlive = $true; Log "adopted inbox worker pid=$live" }
 }
 
 if (-not $qqAlive) {
@@ -145,5 +151,13 @@ if (-not $wakeAlive) {
     $wid = $p2.Id
 } else { $wid = $p.wake }
 
-$json = @{ qq = $qid; wake = $wid; startedAt = (Get-Date).ToString('o') } | ConvertTo-Json
+# 邮箱值班进程（常驻；不依赖任何会话）
+if (-not $inboxAlive) {
+    $p3 = Start-Process -FilePath $node -ArgumentList 'hands/inbox-worker.mjs' -WorkingDirectory $root -WindowStyle Hidden `
+        -RedirectStandardOutput (Join-Path $logs 'inbox-worker.out.log') -RedirectStandardError (Join-Path $logs 'inbox-worker.err.log') -PassThru
+    Log "started inbox worker pid=$($p3.Id)"
+    $iid = $p3.Id
+} else { $iid = $p.inbox }
+
+$json = @{ qq = $qid; wake = $wid; inbox = $iid; startedAt = (Get-Date).ToString('o') } | ConvertTo-Json
 [System.IO.File]::WriteAllText($pidFile, $json, (New-Object System.Text.UTF8Encoding($false)))

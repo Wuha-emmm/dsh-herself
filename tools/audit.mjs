@@ -281,6 +281,17 @@ for (let i = 0; i < comps.length; i += 2) {
   }
 }
 
+// 邮箱值班进程必须真的被拉起（2026-10-30：她的一条单子挂了 8.5 小时没人取）
+{
+  const boot = readSrc('boot.ps1')
+  const stop = readSrc('stop-her.ps1')
+  const file = fs.existsSync(path.join(HER, 'hands', 'inbox-worker.mjs'))
+  const started = /inbox-worker\.mjs/.test(boot)
+  const stopped = /inbox-worker\.mjs/.test(stop)
+  if (file && started && stopped) Y('邮箱值班进程有人拉起、也有人停（boot/stop 都认识它）')
+  else W(`邮箱值班不完整：${file ? '' : '缺 hands/inbox-worker '}${started ? '' : 'boot 不启动 '}${stopped ? '' : 'stop 不停它'}`)
+}
+
 // 联系 DS 的通道必须带身份校验（不是靠她自己判断）
 {
   const tc = readSrc('lib/toolcall.mjs')
