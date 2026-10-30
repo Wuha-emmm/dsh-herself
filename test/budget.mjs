@@ -87,7 +87,7 @@ const ok = (cond, label, extra = '') => {
     const r = factsOf(ev, Date.now(), '', 'qq:private:10001')
     ok(r.budget.used <= FACT_BUDGET, '她的真实一轮在预算内', `${r.budget.used}/${FACT_BUDGET}`)
     ok(r.out.length >= 3, '至少留下核心 + 最近 + 判断', String(r.out.length))
-    ok(r.out[0].includes('第 1 天'), '第一行永远是"第几天"')
+    ok(/第 \d+ 天/.test(r.out[0]), '第一行永远是"第几天"')
   } else {
     ok(true, '（这台机器上没有她的生活目录，跳过）')
   }

@@ -5,6 +5,9 @@
 //   node tools/inbox.mjs reply "解释内容"      # 回给她（她会看到）
 //   node tools/inbox.mjs order "修复指令"      # 主人口吻的指令（也算给她的话）
 import { all, pendingForDsh, pendingForHer, post, markSeen, claimNext, answer, release, openClaim } from '../lib/inbox.mjs'
+import { httpCreds, readOwner } from '../lib/owner.mjs'
+import { splitMessage } from '../lib/split.mjs'
+import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -24,6 +27,25 @@ if (cmd === 'reply' || cmd === 'order') {
 }
 
 if (cmd === 'next') {
+  // status / budget 这两类 DSH 能立刻答（本地数据，不用人看），直接答掉再继续
+  {
+    const quick = pendingForDsh(ROOT).find((x) => x.kind === 'status' || x.kind === 'budget')
+    if (quick) {
+      let body = ''
+      try {
+        const st = JSON.parse(fs.readFileSync(path.join(ROOT, '..', 'logs', 'audit-status.json'), 'utf8'))
+        if (quick.kind === 'status') body = `体检 ${st.ok} 通过 / ${(st.warnings ?? []).length} 警告 / ${(st.problems ?? []).length} 问题`
+        else {
+          const ev = (await import('../lib/store.mjs')).readEvents(ROOT)
+          const th = (await import('../lib/think.mjs')).factsOf(ev, Date.now(), '', '', { budgetWatch: false })
+          body = `提示词 ${th.budget.used} / ${th.budget.cap} token`
+        }
+      } catch (err) { body = String(err?.message ?? err) }
+      answer(ROOT, quick.id, body)
+      console.log('秒答:', quick.kind, '→', body)
+      process.exit(0)
+    }
+  }
   // 一次只领一条：领了别的地方就领不到（她的要求：避免重复执行）
   const r = claimNext(ROOT)
   if (r.ok) {
@@ -43,6 +65,29 @@ if (cmd === 'done') {
   if (!ref || !text) { console.error('用法: done <ref> <回复内容>'); process.exit(1) }
   answer(ROOT, ref, text)
   console.log('已回复并解锁:', ref)
+
+  // 来源是主人的私聊 → 直接发到他 QQ，不等她下一轮
+  const q = all(ROOT).find((x) => x.id === ref)
+  const src = q?.source
+  const relay = !rest.includes('--no-relay') && src?.isOwner !== false && String(src?.thread ?? '').startsWith('qq:private:')
+  if (relay) {
+    try {
+      const c = httpCreds(ROOT.replace(/[\\/]life$/, ''))
+      const owner = readOwner(ROOT.replace(/[\\/]life$/, ''))
+      if (c && owner) {
+        for (const part of splitMessage('DSH 那边回她了（她转过来）：\n\n' + text)) {
+          const r = await fetch(`${c.base}/send_private_msg`, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', authorization: `Bearer ${c.token}` },
+            body: JSON.stringify({ user_id: Number(owner), message: part }),
+            signal: AbortSignal.timeout(20000),
+          })
+          const j = await r.json().catch(() => ({}))
+          console.log(j.retcode === 0 ? '  转发到主人 QQ ✓' : `  转发失败 retcode ${j.retcode}`)
+        }
+      }
+    } catch (err) { console.log('  转发失败:', String(err?.message ?? err)) }
+  }
   process.exit(0)
 }
 
