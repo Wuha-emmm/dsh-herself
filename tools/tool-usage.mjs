@@ -11,6 +11,7 @@
 //   node tools/tool-usage.mjs --reset    # 重新打一个 start（会提醒：这会丢窗口）
 import fs from 'node:fs'
 import path from 'node:path'
+import { bj } from '../lib/timefmt.mjs'
 
 const HER = HER
 const START_FILE = path.join(HER, 'logs', 'tool-usage-start.json')
@@ -66,7 +67,7 @@ for (const n of WATCH) {
     // 找同一分钟内那轮的正文
     const near = traces.filter((t) => Math.abs(Date.parse(t.ts) - Date.parse(c.at)) < 90 * 1000 && t.userText)
     const say = near.length ? String(near[near.length - 1].userText).replace(/\s+/g, ' ').slice(0, 50) : '(没找到那轮正文)'
-    console.log(`  ${c.at.slice(5, 16)} 参数 ${c.args} → ${c.chars} 字 / ${c.lines} 行｜当时他说：${say}`)
+    console.log(`  ${bj(c.at)} 参数 ${c.args} → ${c.chars} 字 / ${c.lines} 行｜当时他说：${say}`)
   }
 }
 

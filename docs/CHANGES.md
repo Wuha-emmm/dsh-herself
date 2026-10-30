@@ -225,3 +225,14 @@
 | 怎么退 | 把 formatLocal 改回 slice(5,16) |
 | 影响 | 她再翻 sandbox/DSH-回话.md 不会误判成旧内容 |
 | 提交 | 78a50bb |
+
+## 2026-10-30 09:10 所有给她看的时间统一成北京时间
+
+| 项 | 内容 |
+|---|---|
+| 动了什么 | 新增 lib/timefmt.mjs（bj/bjHM/bjFull/bjDay/bjSec）；改了 lib/inbox.mjs（回话镜像标题）、lib/qzone.mjs（动态/说说时间）、lib/toolcall.mjs（历史消息时分）、lib/ledger.mjs + tools/ledger.mjs（账本时刻）、lib/gate.mjs（许可到期）、wake.mjs（日志前缀）、tools/changelog.mjs（改动单标题）、tools/pick-review.mjs、tools/tool-usage.mjs |
+| 为什么 | 主人要求统一北京时间；此前回话镜像标题是 UTC，她按本地读会以为文件是 8 小时前的、没人回 |
+| 谁提的 | 我（DS） |
+| 怎么退 | 把这些调用换回 toISOString().slice() |
+| 影响 | 存储仍是 ISO(UTC)；凡给人看的都变成北京（带'（北京）'标注） |
+| 提交 | ad80229 |

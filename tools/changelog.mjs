@@ -14,6 +14,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { post } from '../lib/inbox.mjs'
+import { bjFull } from '../lib/timefmt.mjs'
 
 const HER = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\//, '')), '..')
 const ROOT = path.join(HER, 'life')
@@ -57,7 +58,7 @@ if (!title || !what || !why) {
   process.exit(1)
 }
 
-const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ')
+const stamp = bjFull(new Date())
 // 记下当前 HEAD：link-check 靠它把提交和改动单对上
 let gitHead = ''
 try { gitHead = (await import('node:child_process')).execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: HER, encoding: 'utf8' }).trim() } catch { /* 不是仓库 */ }

@@ -10,6 +10,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { bj } from '../lib/timefmt.mjs'
 
 // 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
 const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -78,7 +79,7 @@ if (cmd === 'nomatch') {
   const shuffled = [...picksAll].sort(() => Math.random() - 0.5).slice(0, n)
   console.log(`抽查 ${shuffled.length} / ${total} 条（覆盖 ${Math.round((shuffled.length / total) * 100)}%）\n`)
   for (const p of shuffled) {
-    console.log('问：' + p.query + '（' + String(p.at).slice(5, 16) + '）')
+    console.log('问：' + p.query + '（' + bj(p.at) + '）')
     console.log('  模型旁白：' + String(p.why ?? '').slice(0, 60) + '（线索，非证据）')
     for (const c of p.candidates ?? []) console.log('  · ' + String(c.text ?? c).slice(0, 60))
     console.log('')
@@ -92,7 +93,7 @@ const mismatches = log.filter((x) => x.kind === 'pick-mismatch')
 console.log(`挑判断记录：${picks.length} 条｜已标注误配：${mismatches.length} 条`)
 for (const [i, p] of picks.entries()) {
   const bad = mismatches.find((m) => m.ref === p.at)
-  console.log(`\n${i + 1}. ${String(p.at).slice(5, 16)} [${p.method}] 问：${p.query}`)
+  console.log(`\n${i + 1}. ${bj(p.at)} [${p.method}] 问：${p.query}`)
   console.log(`   挑中：${textOf(p.picked).slice(0, 60)}`)
   console.log(`   旁白：${String(p.why ?? '').slice(0, 60)}（线索，非证据）`)
   if (bad) console.log(`   ⚠ 误配：该挑的是「${bad.expectedText.slice(0, 50)}」${bad.note ? '｜' + bad.note : ''}`)

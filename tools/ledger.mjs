@@ -16,6 +16,7 @@ import { readEvents } from '../lib/store.mjs'
 import { liveEvents } from '../lib/derive.mjs'
 import { candidates, ledgerReply } from '../lib/ledger.mjs'
 import { fileURLToPath } from 'node:url'
+import { bjHM } from '../lib/timefmt.mjs'
 
 // 仓库根按本文件位置推导：换台机器/换个目录拷过去也能跑（2026-10-30 整理）
 const HER = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -60,4 +61,4 @@ const shown = all.filter((x) => !cfg.off.includes(x.kind))
 console.log(ledgerReply(shown) || '今天没什么该记的。')
 if (cfg.off.length) console.log(`（关着的类：${cfg.off.map((k) => LABEL[k]).join('、')}）`)
 const hidden = all.filter((x) => cfg.off.includes(x.kind))
-if (hidden.length) console.log(`（被关掉、没显示的 ${hidden.length} 条：\n${hidden.map((x) => `   ${String(x.at).slice(11, 16)} ${x.text}（${x.why}）`).join('\n')}`)
+if (hidden.length) console.log(`（被关掉、没显示的 ${hidden.length} 条：\n${hidden.map((x) => `   ${bjHM(x.at)} ${x.text}（${x.why}）`).join('\n')}`)

@@ -15,6 +15,7 @@ import { effectivePrefs, DEFAULTS } from './lib/prefs.mjs'
 import { readEvents, appendEvent } from './lib/store.mjs'
 import { maybeClose } from './lib/summary.mjs'
 import { claimSlot } from './lib/singleton.mjs'
+import { bjFull } from './lib/timefmt.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(process.env.DSH_HERSELF_ROOT || path.join(here, 'life'))
@@ -30,7 +31,7 @@ function beat() {
 }
 
 function log(line) {
-  const s = `[${new Date().toISOString().slice(0, 19)}] ${line}`
+  const s = `[${bjFull(new Date())}] ${line}`
   console.log(s)
   try { fs.mkdirSync(path.dirname(LOG), { recursive: true }); fs.appendFileSync(LOG, s + '\n') } catch { /* ignore */ }
 }
