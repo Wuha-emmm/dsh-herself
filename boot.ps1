@@ -149,6 +149,16 @@ if (-not $inboxAlive) {
     $live = Find-Node '*inbox-worker.mjs*'
     if ($live) { $p | Add-Member -NotePropertyName inbox -NotePropertyValue $live -Force; $inboxAlive = $true; Log "adopted inbox worker pid=$live" }
 }
+# 值班进程也吃代码：它自己不会因为文件变了而重载
+if ($inboxAlive) {
+    $needW = & $node (Join-Path $root 'tools/need-restart.mjs') --worker
+    if ("$needW".Trim() -eq 'restart') {
+        $oldW = $p.inbox
+        if ($oldW) { Stop-Process -Id $oldW -Force -ErrorAction SilentlyContinue }
+        Log "restart inbox worker: code changed (old pid=$oldW)"
+        $inboxAlive = $false
+    }
+}
 
 if (-not $qqAlive) {
     $p1 = Start-Process -FilePath $node -ArgumentList 'hands/qq.mjs','listen' -WorkingDirectory $root -WindowStyle Hidden `

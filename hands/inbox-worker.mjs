@@ -42,12 +42,29 @@ if (!slot.ok) { console.log('已有一个 inbox-worker 在跑，退出'); proces
 try { fs.mkdirSync(LOG_DIR, { recursive: true }); fs.writeFileSync(path.join(LOG_DIR, 'heartbeat-inbox.txt'), new Date().toISOString()) } catch { /* ignore */ }
 log('start', { pid: process.pid, tickMs: TICK_MS })
 
-/** 秒答：这两类不需要人，本地数据就够 */
-function quickAnswer(item) {
+/** 秒答：这几类不需要人，本地数据就够（async 是因为要读事件流） */
+async function quickAnswer(item) {
   try {
     if (item.kind === 'status') {
       const st = JSON.parse(fs.readFileSync(path.join(LOG_DIR, 'audit-status.json'), 'utf8'))
       return `体检 ${st.ok} 通过 / ${(st.warnings ?? []).length} 警告 / ${(st.problems ?? []).length} 问题`
+    }
+    if (item.kind === 'tools') {
+      const tc = fs.readFileSync(path.join(HER, 'lib', 'toolcall.mjs'), 'utf8')
+      const names = [...tc.matchAll(/name: '(\w+)',\s*\n\s*description:/g)].map((m) => m[1])
+      return `我现在有 ${names.length} 只手：${names.join('、')}（详见 docs/SKILLS.md）`
+    }
+    if (item.kind === 'memory') {
+      const { readEvents } = await import('../lib/store.mjs')
+      const { derive } = await import('../lib/derive.mjs')
+      const ev = readEvents(ROOT)
+      const st2 = derive(ev, Date.now())
+      return `事件 ${ev.length} 条｜第 ${st2.day} 天｜判断 ${st2.beliefs.filter((b) => b.status === 'active').length} 条活跃`
+    }
+    if (item.kind === 'changelog') {
+      const doc = fs.readFileSync(path.join(HER, 'docs', 'CHANGES.md'), 'utf8')
+      const heads = doc.split('\n').filter((l) => /^## \d{4}-/.test(l)).slice(-3)
+      return `最近三条改动单：\n${heads.map((h) => '- ' + h.replace(/^## /, '')).join('\n')}`
     }
     if (item.kind === 'budget') {
       // 只报上限和当前会话的规则，不现算（现算要读全量事件，值班进程不该干这个）
@@ -85,17 +102,23 @@ async function tick() {
   const state = readState()
 
   for (const item of pend) {
-    // 秒答类：答完就走
-    if (item.kind === 'status' || item.kind === 'budget') {
-      const body = quickAnswer(item)
+    // 秒答类：答完就走（status/budget/tools/memory/changelog 都是本地能查的）
+    if (['status', 'budget', 'tools', 'memory', 'changelog'].includes(item.kind)) {
+      const body = await quickAnswer(item)
       if (body) { answer(ROOT, item.id, body); log('quick-answer', { id: item.id, kind: item.kind, body }); continue }
     }
-    // 需要人答的：只在"挂太久且还没提醒过"时提醒一次
+    // 需要人答的：**立刻**报一次，之后每 30 分钟再提醒，最多 3 次
+    // （2026-10-30 11:40：原来是等 30 分钟才报，主人说"我发的指令为什么没接"——
+    //   等半小时才告诉他，等于没接。现在第一 tick 就报。）
     const ageMs = Date.now() - Date.parse(item.at)
-    if (ageMs > STALE_MS && !state.escalated[item.id]) {
-      const mins = Math.round(ageMs / 60000)
-      const ok = await notifyOwner(`【她的单子挂了 ${mins} 分钟】${String(item.text).slice(0, 200)}\n（我这边没人取，先报你一声；id ${item.id}）`)
-      if (ok) { state.escalated[item.id] = new Date().toISOString(); log('escalated', { id: item.id, mins }) }
+    const prev = state.escalated[item.id]
+    const prevAt = prev ? Date.parse(prev.at ?? prev) : 0
+    const count = prev?.count ?? (prev ? 1 : 0)
+    const due = !prev || (count < 3 && Date.now() - prevAt > 30 * 60_000)
+    if (due) {
+      const mins = Math.max(0, Math.round(ageMs / 60000))
+      const ok = await notifyOwner(`【她投了一条，我这边还没人处理】${mins > 0 ? `挂了 ${mins} 分钟` : '刚到'}\n${String(item.text).slice(0, 300)}\n（要处理就开 DSH 说一句；id ${item.id}）`)
+      if (ok) { state.escalated[item.id] = { at: new Date().toISOString(), count: count + 1 }; log('escalated', { id: item.id, mins, count: count + 1 }) }
     }
   }
 

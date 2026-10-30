@@ -44,6 +44,21 @@ function lastBuild() {
   } catch { return 0 }
 }
 
+// --worker：值班进程用的是一组代码（hands/inbox-worker.mjs + lib/*），
+// 它的 "build" 就是日志里最后一条 start 的时间
+if (process.argv.includes('--worker')) {
+  const wlog = path.join(HER, 'logs', 'inbox-worker.log')
+  let started = 0
+  try {
+    const lines = fs.readFileSync(wlog, 'utf8').trim().split('\n')
+    const last = [...lines].reverse().find((l) => l.includes('"msg":"start"'))
+    started = Date.parse(JSON.parse(last).at)
+  } catch { /* 没跑过 */ }
+  const stale = started > 0 && newestCodeMtime() > started + 1000
+  console.log(stale ? 'restart' : 'ok')
+  process.exit(stale ? 1 : 0)
+}
+
 const code = newestCodeMtime()
 const build = lastBuild()
 const stale = build > 0 && code > build + 1000
