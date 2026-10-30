@@ -122,6 +122,19 @@ $qqAlive = Alive $p.qq
 $wakeAlive = Alive $p.wake
 $inboxAlive = Alive $p.inbox
 
+# ---- 3. 代码变了就重启她（别让她一直跑旧代码）----
+# 2026-10-30：boot 是幂等的，只补缺失、不因代码变化重启；改完 lib/ hands/ 全凭"记得"敲 -Force。
+# 现在 boot 自己判断：她启动时的 build 戳 < 代码最新改动时间 → 停掉重起。
+if ($qqAlive) {
+    $need = & $node (Join-Path $root 'tools/need-restart.mjs')
+    if ("$need".Trim() -eq 'restart') {
+        $old = $p.qq
+        if ($old) { Stop-Process -Id $old -Force -ErrorAction SilentlyContinue }
+        Log "restart qq listener: code changed (old pid=$old)"
+        $qqAlive = $false
+    }
+}
+
 # 记录是死的、人还活着（孤儿）：认回来，别再多起一个
 if (-not $qqAlive) {
     $live = Find-Node '*hands/qq.mjs*'
